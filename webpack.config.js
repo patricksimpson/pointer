@@ -13,6 +13,7 @@ module.exports = {
     allowedHosts: [
       'localhost'
     ],
+    historyApiFallback: true,
     disableHostCheck: true,
     watchContentBase: true,
     compress: true,

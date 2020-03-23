@@ -1,15 +1,50 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import {
+  BrowserRouter as Router,
+  Route,
+  Switch,
+  Link
+} from 'react-router-dom';
 
 import { Start, Join } from './session';
+import { Room } from './Room';
 
 const App = () => {
   return (
-      <>
+    <>
       <Header />
-      <Start />
-      <Join />
-      </>
+      <Router>
+        <nav>
+          <ul>
+            <li><Link to="/">Home</Link></li>
+            <li><Link to="/start-session">Start Session</Link></li>
+            <li>About</li>
+          </ul>
+        </nav>
+        <Switch>
+          <Route path="/start-session">
+            <Start/>
+          </Route>
+          <Route path="/about">
+            <About/>
+          </Route>
+          <Route path="/room/:roomId" component={Room} />
+          <Route path="/">
+            <Home />
+          </Route>
+          <Route component={NoMatch}/>
+        </Switch>
+      </Router>
+    </>
+  );
+};
+
+const NoMatch = () => {
+  return (
+    <div>
+      <h2>404 - Not Found</h2>
+    </div>
   );
 };
 
@@ -17,8 +52,27 @@ const Header = () => {
   return (
       <>
       <h1>Pointer</h1>
-      <div className="subheader">Welcome to pointer... all of your pointing needs.</div>
+      <div className="subheader">Pointing Tool</div>
       </>
+  );
+};
+
+const Home = () => {
+  return (
+    <>
+      <h2>Home</h2>
+      <p>Join or Start a Session...</p>
+    </>
+  );
+}
+
+const About = () => {
+  return (
+    <>
+    <h2>About</h2>
+      <p>This is a pointing tool, for story planning</p>
+      <p>Created by Patrick Simpson</p>
+    </>
   );
 };
 
