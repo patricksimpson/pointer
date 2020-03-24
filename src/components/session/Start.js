@@ -16,11 +16,9 @@ const Start = () => {
   }, []);
 
   const startSession = () => {
-    console.log(sessionName);
     socket = socketIOClient(endpoint);
-    socket.emit('start-session', {sessionName});
+    socket.emit('start-session', {sessionName: null});
     socket.on('create-room', data => {
-      console.log(data);
       setRediect(data);
     });
   };
@@ -33,7 +31,6 @@ const Start = () => {
     <>
     <h2>Start Session</h2>
       <div className="box start-session">
-        <input type="text" name="session-name" placeholder="session name" value={sessionName} onChange={updateSession}/>
         <button onClick={startSession}>Start Session</button>
         <div> 
             {response ? (<p> {response.data} </p>): (<p>Loading...</p>)}
