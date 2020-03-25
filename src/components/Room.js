@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Redirect } from 'react-router-dom';
 import { useParams } from 'react-router';
 import socketIOClient from 'socket.io-client';
+import { endpoint } from '../endpoint';
 
 const Room = () => {
   let { roomId } = useParams();
@@ -16,7 +17,6 @@ const Room = () => {
   const [showVotes, setShowVotes] = useState(false);
   const [joinedRoom, setJoinedRoom] = useState(false);
   const [notFound, setNotFound] = useState(false);
-  const endpoint = 'http://localhost:4001';
 
   useEffect(() => {
     socket = socketIOClient(endpoint);
