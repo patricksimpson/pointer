@@ -16,7 +16,7 @@ const Room = () => {
   const [showVotes, setShowVotes] = useState(false);
   const [joinedRoom, setJoinedRoom] = useState(false);
   const [notFound, setNotFound] = useState(false);
-  const endpoint = 'http://0.0.0.0:4001';
+  const endpoint = 'http://localhost:4001';
 
   useEffect(() => {
     socket = socketIOClient(endpoint);
