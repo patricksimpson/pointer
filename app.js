@@ -72,12 +72,16 @@ io.on('connection', function (socket) {
         console.log(CAST_VOTE, data);
       });
       socket.on(ROOM_SHOW_VOTES, function(data) {
+        room.showVotes = true;
         io.to(roomId).emit(ROOM_SHOW_VOTES);
       });
-
+      socket.on(ROOM_HIDE_VOTES, function(data) {
+        room.showVotes = false;
+        io.to(roomId).emit(ROOM_HIDE_VOTES);
+      });
       socket.on(ROOM_CLEAR_VOTES, function(data) {
-        console.log('clear votes');
-        clearVotes(roomId);
+        room.showVotes = false;
+        clearVotes(roomId, socket);
         io.to(roomId).emit(ROOM_HIDE_VOTES);
       });
 
@@ -93,7 +97,12 @@ function getRoom(roomId) {
 
 function getRoomUsers(roomId) {
   let room = getRoom(roomId);
-  return room.users.map((id) => ({id, name: users[id], vote: votes[id]}));
+  return room.users.map((id) => ({id, name: users[id], vote: getVote(id, roomId)}));
+}
+
+function getVote(id, roomId) {
+  let room = getRoom(roomId);
+  return room.showVotes ? votes[id] : !!votes[id];
 }
 
 function leaveRoom(roomId, socket) {
@@ -103,17 +112,17 @@ function leaveRoom(roomId, socket) {
   console.log(LEAVE_ROOM, socket.id);
 }
 
-function adviseRoom(roomId) {
+function adviseRoom(roomId, socket) {
   let roomUsers = getRoomUsers(roomId);
   io.to(roomId).emit(UPDATE_ROOM, { users: roomUsers });
   console.log(UPDATE_ROOM, roomId);
 }
 
-function clearVotes(roomId) {
-  let roomUsers = getRoomUsers(roomId);
+function clearVotes(roomId, socket) {
+  let roomUsers = getRoomUsers(roomId, socket);
   console.log(roomUsers);
   roomUsers.forEach((user) => removeVote(user.id));
-  adviseRoom(roomId);
+  adviseRoom(roomId, socket);
 }
 
 function removeVote(id) {
@@ -132,8 +141,9 @@ function createRoom(socket, data) {
   let roomId = makeId(12);
   socket.emit(CREATE_ROOM, { data: roomId});
   socket.join(roomId);
-  rooms.push({id: roomId, users: []});
-  console.log(CREATE_ROOM, data, roomId);
+  let room = {id: roomId, users: [], showVotes: false};
+  rooms.push(room);
+  console.log(CREATE_ROOM, data, room);
 }
 
 function makeId(length) {

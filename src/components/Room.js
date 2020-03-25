@@ -56,7 +56,7 @@ const Room = () => {
   const usersList = (users) => {
     return(
       <ul> 
-        {users ? users.map((user) => (<li key={user.id}>{user.name} {user.vote ? displayVote(user.id, user.vote) : 'not voted' }</li>)) : (<li>No one here...</li>)}
+        {users ? users.map((user) => (<li key={user.id} className={`user${user.id === userId ? ' current-user' : ''}`}>{user.name} {user.vote ? displayVote(user.id, user.vote) : 'not voted' }</li>)) : (<li>No one here...</li>)}
       </ul>
     );
   };
@@ -97,10 +97,15 @@ const Vote = ({socket}) => {
     socket.emit('room-show-votes');
   };
 
+  const hideVotes = () => {
+    socket.emit('room-hide-votes');
+  };
+
   return (
     <>
       <div>
         <button onClick={showVotes}>Show Votes</button>
+        <button onClick={hideVotes}>Hide Votes</button>
         <button onClick={clearVotes}>Clear Votes</button>
       </div>
       <br />
