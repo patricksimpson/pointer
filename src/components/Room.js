@@ -42,10 +42,16 @@ const Room = () => {
     setName(e.target.value);
   };
 
-  const submitUpdateName = () => {
+  const submitUpdateName = (e) => {
+    if (name.trim() === '') {
+      alert('Name is required');
+      e.preventDefault();
+      return false;
+    }
     socket = session;
     socket.emit('person-update-name', {name});
     setJoinedRoom(true);
+    return true;
   };
 
   const displayVote = (id, vote) => (showVotes ? vote.toString() : (userId === id ? currentVote : (vote ? 'voted' : 'not voted')));
