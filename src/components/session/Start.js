@@ -7,7 +7,7 @@ const Start = () => {
   const [response, setResponse] = useState(0);
   const [sessionName, setSessionName] = useState('') ;
   const [redirect, setRediect] = useState();
-  const endpoint = 'http://0.0.0.0:4001';
+  const endpoint = 'http://localhost:4001';
   let socket;
 
   useEffect(() => {
