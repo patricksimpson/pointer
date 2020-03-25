@@ -85,12 +85,12 @@ const Room = () => {
 };
 
 const Vote = ({socket, currentVote, setCurrentVote}) => {
-  let voteSequence = [0, 1, 2, 3, 5, 8, 13, '?'];
+  let voteSequence = [false, '0', '0.5', 1, 2, 3, 5, 8, 13, '?'];
 
 
   const castVote = (vote) => {
     setCurrentVote(vote);
-    socket.emit('cast-vote', {vote});
+    socket.emit('cast-vote', {vote: vote});
   };
 
   const clearVotes = () => {
@@ -118,7 +118,7 @@ const Vote = ({socket, currentVote, setCurrentVote}) => {
       </div>
       <br />
       <div>
-        {voteSequence.map((v) => (<button key={`key-${v}`} className={voteClass(v)} onClick={() => castVote(v)}>{v}</button>))}
+    {voteSequence.map((v) => (<button key={`key-${v.toString()}`} className={voteClass(v)} onClick={() => castVote(v)}>{v ? v : 'remove vote'}</button>))}
       </div>
     </>
   );

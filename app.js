@@ -54,6 +54,7 @@ io.on('connection', function (socket) {
 
   socket.on(DISCONNECT, function(data){
     delete users[socket.id];
+    delete votes[socket.id];
     adviseUsersOnline(socket);
   });
 
@@ -136,6 +137,7 @@ function leaveRoom(roomId, socket) {
     adviseRoom(roomId, socket);
   }
   delete users[socket.id];
+  delete votes[socket.id];
 }
 
 function deleteRoom(roomId) {
