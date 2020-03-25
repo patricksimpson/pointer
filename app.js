@@ -54,11 +54,17 @@ io.on('connection', function (socket) {
 
     // Private message to user, room id and user id of current user;
     io.to(socket.id).emit(JOINED_ROOM, { roomId, userId: socket.id});
-    log(LEAVE_ROOM, {roomId, id: socket.id});
 
     if(room) {
       joinRoom(roomId, socket);
-      socket.on([LEAVE_ROOM, DISCONNECT], function(data) {
+      log(JOIN_ROOM, roomId);
+
+      socket.on(LEAVE_ROOM, function(data) {
+        leaveRoom(roomId, socket);
+        log(LEAVE_ROOM, {roomId, id: socket.id});
+      });
+
+      socket.on(DISCONNECT, function(data) {
         leaveRoom(roomId, socket);
         log(LEAVE_ROOM, {roomId, id: socket.id});
       });
@@ -68,30 +74,25 @@ io.on('connection', function (socket) {
       socket.on(UPDATE_NAME, function(data) {
         users[socket.id] = data.name.substring(0, MAX_NAME_LENGTH).trim();
         adviseRoom(roomId, socket);
-        log(UPDATE_NAME, roomId);
       });
       socket.on(CAST_VOTE, function(data) {
         votes[socket.id] = data.vote;
         adviseRoom(roomId, socket);
-        log(CAST_VOTE, roomId);
       });
       socket.on(ROOM_SHOW_VOTES, function(data) {
         room.showVotes = true;
         adviseRoom(roomId, socket);
         io.to(roomId).emit(ROOM_SHOW_VOTES);
-        log(ROOM_SHOW_VOTES, roomId);
       });
       socket.on(ROOM_HIDE_VOTES, function(data) {
         room.showVotes = false;
         adviseRoom(roomId, socket);
         io.to(roomId).emit(ROOM_HIDE_VOTES);
-        log(ROOM_HIDE_VOTES, roomId);
       });
       socket.on(ROOM_CLEAR_VOTES, function(data) {
         room.showVotes = false;
         clearVotes(roomId, socket);
         io.to(roomId).emit(ROOM_HIDE_VOTES);
-        log(ROOM_CLEAR_VOTES, roomId);
       });
 
     } else {

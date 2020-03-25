@@ -60,11 +60,11 @@ const Room = () => {
 
   const nameInput = () => {
     return (
-      <div className="input-name">
+      <form className="input-name" onSubmit={submitUpdateName}>
         <h3>Your Name</h3>
         <input type="text" value={name} onChange={updateName} maxlength="26"/> 
         <button onClick={submitUpdateName}>Set Name</button>
-      </div>
+      </form>
     );
   };
 

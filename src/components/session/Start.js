@@ -34,7 +34,7 @@ const Start = () => {
       <div className="box start-session">
         <button onClick={startSession}>Start Session</button>
         <div> 
-            {response ? (<p> {response.data} </p>): (<p>Loading...</p>)}
+            {response ? (<p> {response.data} </p>): (<p>Server Offline</p>)}
         </div>
         {redirect ? (<Redirect to={`/room/${redirect.data}`} />) : null}
       </div>
