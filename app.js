@@ -76,8 +76,6 @@ io.on('connection', function (socket) {
       });
 
       socket.on(DISCONNECT, function(data) {
-        delete users[socket.id];
-        adviseUsersOnline(socket);
         leaveRoom(roomId, socket);
         log(LEAVE_ROOM, {roomId, id: socket.id});
       });
@@ -129,12 +127,15 @@ function getVote(id, roomId) {
 
 function leaveRoom(roomId, socket) {
   let room = getRoom(roomId);
-  room.users = room.users.filter((user) => user !== socket.id);
-  if (room.users.length < 1) {
-    deleteRoom(roomId);
-    adviseRoomsOnline(socket);
+  if(room) {
+    room.users = room.users.filter((user) => user !== socket.id);
+    if (room.users.length < 1) {
+      deleteRoom(roomId);
+      adviseRoomsOnline(socket);
+    }
+    adviseRoom(roomId, socket);
   }
-  adviseRoom(roomId, socket);
+  delete users[socket.id];
 }
 
 function deleteRoom(roomId) {
