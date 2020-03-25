@@ -1,0 +1,26 @@
+html, body {
+  font-family: 'Roboto', sans-serif;
+}
+
+.current-user {
+  font-weight: bold;
+}
+
+.user-list {
+  padding: 0;
+}
+
+.user {
+  width: 30rem;
+  display: flex;
+  padding: 0.25rem 0.5rem;
+  font-size: 1.1rem;
+}
+
+.user-name {
+  width: 75%;
+}
+
+.user-vote {
+  width: 25%;
+}

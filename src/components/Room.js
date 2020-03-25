@@ -2,10 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { Redirect } from 'react-router-dom';
 import { useParams } from 'react-router';
 import socketIOClient from 'socket.io-client';
+
 const Room = () => {
   let { roomId } = useParams();
   let socket;
   let isNameSet = false;
+
+  const [currentVote, setCurrentVote] = useState(-1);
   const [session, setSession] = useState();
   const [userId, setUserId] = useState(0);
   const [users, setUsers] = useState([]);
@@ -21,15 +24,9 @@ const Room = () => {
     socket.on('joined-room', data => {
       setUserId(data.userId);
     });
-    socket.on('person-joined', data => { console.log('got person', data); });
-    socket.on('person-updated-name', data => { console.log('update person', data); });
-    socket.on('cast-vote', data => {
-      console.log(data);
-    });
     socket.on('room-show-votes', data => {
       setShowVotes(true);
     });
-
     socket.on('room-hide-votes', data => {
       setShowVotes(false);
     });
@@ -51,12 +48,12 @@ const Room = () => {
     setJoinedRoom(true);
   };
 
-  const displayVote = (id, vote) => (showVotes || userId === id ? vote : 'voted');
+  const displayVote = (id, vote) => (showVotes ? vote.toString() : (userId === id ? currentVote : (vote ? 'voted' : 'not voted')));
 
   const usersList = (users) => {
     return(
-      <ul> 
-        {users ? users.map((user) => (<li key={user.id} className={`user${user.id === userId ? ' current-user' : ''}`}>{user.name} {user.vote ? displayVote(user.id, user.vote) : 'not voted' }</li>)) : (<li>No one here...</li>)}
+      <ul className="user-list"> 
+        {users ? users.map((user) => (<li key={user.id} className={`user${user.id === userId ? ' current-user' : ''}`}><span className='user-name'>{user.name}</span><span className='user-vote'>{user.vote ? displayVote(user.id, user.vote) : 'not voted' }</span></li>)) : (<li>No one here...</li>)}
       </ul>
     );
   };
@@ -74,7 +71,7 @@ const Room = () => {
   return(
     <>
       <h2>Room - {roomId}</h2>
-      {joinedRoom? (<Vote socket={session}/>) : null}
+      {joinedRoom? (<Vote socket={session} currentVote={currentVote} setCurrentVote={setCurrentVote}/>) : null}
       {userId ? null: (<p>Please wait...</p>)}
       {joinedRoom ? usersList(users) :  nameInput()}
       {notFound ? (<Redirect to="/" />) : null}
@@ -82,10 +79,12 @@ const Room = () => {
   );
 };
 
-const Vote = ({socket}) => {
+const Vote = ({socket, currentVote, setCurrentVote}) => {
   let voteSequence = [0, 1, 2, 3, 5, 8, 13, '?'];
 
+
   const castVote = (vote) => {
+    setCurrentVote(vote);
     socket.emit('cast-vote', {vote});
   };
 
@@ -101,6 +100,10 @@ const Vote = ({socket}) => {
     socket.emit('room-hide-votes');
   };
 
+  const voteClass = (v) => {
+    return `vote${v === currentVote ? ' current-vote' : ''}`;
+  };
+
   return (
     <>
       <div>
@@ -110,7 +113,7 @@ const Vote = ({socket}) => {
       </div>
       <br />
       <div>
-        {voteSequence.map((v) => (<button key={`key-${v}`} onClick={() => castVote(v)}>{v}</button>))}
+        {voteSequence.map((v) => (<button key={`key-${v}`} className={voteClass(v)} onClick={() => castVote(v)}>{v}</button>))}
       </div>
     </>
   );

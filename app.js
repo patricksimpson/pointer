@@ -46,7 +46,6 @@ io.on('connection', function (socket) {
   });
 
   socket.on(JOIN_SESSION, function (data) {
-    console.log(JOIN_SESSION, data);
     const roomId = data.roomId;
     let room = getRoom(roomId);
     users[socket.id] = DEFAULT_NAME;
@@ -69,14 +68,15 @@ io.on('connection', function (socket) {
       socket.on(CAST_VOTE, function(data) {
         votes[socket.id] = data.vote;
         adviseRoom(roomId, socket);
-        console.log(CAST_VOTE, data);
       });
       socket.on(ROOM_SHOW_VOTES, function(data) {
         room.showVotes = true;
+        adviseRoom(roomId, socket);
         io.to(roomId).emit(ROOM_SHOW_VOTES);
       });
       socket.on(ROOM_HIDE_VOTES, function(data) {
         room.showVotes = false;
+        adviseRoom(roomId, socket);
         io.to(roomId).emit(ROOM_HIDE_VOTES);
       });
       socket.on(ROOM_CLEAR_VOTES, function(data) {
@@ -109,18 +109,15 @@ function leaveRoom(roomId, socket) {
   let room = getRoom(roomId);
   room.users = room.users.filter((user) => user !== socket.id);
   adviseRoom(roomId, socket);
-  console.log(LEAVE_ROOM, socket.id);
 }
 
 function adviseRoom(roomId, socket) {
   let roomUsers = getRoomUsers(roomId);
   io.to(roomId).emit(UPDATE_ROOM, { users: roomUsers });
-  console.log(UPDATE_ROOM, roomId);
 }
 
 function clearVotes(roomId, socket) {
   let roomUsers = getRoomUsers(roomId, socket);
-  console.log(roomUsers);
   roomUsers.forEach((user) => removeVote(user.id));
   adviseRoom(roomId, socket);
 }
@@ -134,7 +131,6 @@ function joinRoom(roomId, socket) {
   room.users.push(socket.id);
   socket.join(roomId);
   adviseRoom(roomId, socket);
-  console.log(JOIN_ROOM, roomId);
 }
 
 function createRoom(socket, data) {
@@ -143,7 +139,6 @@ function createRoom(socket, data) {
   socket.join(roomId);
   let room = {id: roomId, users: [], showVotes: false};
   rooms.push(room);
-  console.log(CREATE_ROOM, data, room);
 }
 
 function makeId(length) {
