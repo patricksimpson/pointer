@@ -22,8 +22,8 @@
     "webpack-dev-server": "^3.10.3"
   },
   "scripts": {
-    "build": "npm run test && npm run lint && webpack --mode production && npm run build:create",
-    "asset:copy": "cp -R ./src/static ./build/ && cp ./src/index.html ./build/index.html && cp ./src/brushColors.js ./build/brushColors.js",
+    "build": "webpack --mode production && npm run build:create",
+    "asset:copy": "cp -R ./src/static ./build/ && cp ./src/index.html ./build/index.html",
     "build:create": "mkdir -p build && npm run asset:copy && cp -R ./dist ./build/",
     "clean": "rm -rf ./build ./dist",
     "lint": "eslint src/**/*.js",

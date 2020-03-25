@@ -62,8 +62,8 @@ const Room = () => {
     return (
       <div className="input-name">
         <h3>Your Name</h3>
-        <input type="text" value={name} onChange={updateName}/> 
-        <button onClick={submitUpdateName}>Update</button>
+        <input type="text" value={name} onChange={updateName} maxlength="26"/> 
+        <button onClick={submitUpdateName}>Set Name</button>
       </div>
     );
   };

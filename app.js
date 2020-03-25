@@ -35,6 +35,8 @@ const JOINED_ROOM = 'joined-room';
 
 const DEFAULT_NAME = '...';
 
+const MAX_NAME_LENGTH = 26;
+
 
 function handler (req, res) {}
 
@@ -62,7 +64,7 @@ io.on('connection', function (socket) {
         delete users[socket.id];
       });
       socket.on(UPDATE_NAME, function(data) {
-        users[socket.id] = data.name;
+        users[socket.id] = data.name.substring(0, MAX_NAME_LENGTH).trim();
         adviseRoom(roomId, socket);
       });
       socket.on(CAST_VOTE, function(data) {

@@ -19,7 +19,7 @@ const App = () => {
           <ul>
             <li><Link to="/">Home</Link></li>
             <li><Link to="/start-session">Start Session</Link></li>
-            <li>About</li>
+            <li><Link to="/about">About</Link></li>
           </ul>
         </nav>
         <Switch>
@@ -52,7 +52,7 @@ const Header = () => {
   return (
       <>
       <h1>Pointer</h1>
-      <div className="subheader">Pointing Tool</div>
+      <div className="subheader">Pointing tool</div>
       </>
   );
 };
@@ -72,6 +72,7 @@ const About = () => {
     <h2>About</h2>
       <p>This is a pointing tool, for story planning</p>
       <p>Created by Patrick Simpson</p>
+      <p><a href="https://github.com/patricksimpson/pointer">https://github.com/patricksimpson/pointer</a></p>
     </>
   );
 };
