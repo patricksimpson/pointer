@@ -68,14 +68,13 @@ const Room = () => {
     );
   };
 
-  return(
-    <>
-      <h2>Room - {roomId}</h2>
-      {joinedRoom? (<Vote socket={session} currentVote={currentVote} setCurrentVote={setCurrentVote}/>) : null}
-      {userId ? null: (<p>Please wait...</p>)}
-      {joinedRoom ? usersList(users) :  nameInput()}
-      {notFound ? (<Redirect to="/" />) : null}
-    </>
+  return notFound ? (<><h2>Not found</h2><p> Try another session, or create one!</p></>) : (
+      <>
+        <h2>Room - {roomId}</h2>
+        {joinedRoom? (<Vote socket={session} currentVote={currentVote} setCurrentVote={setCurrentVote}/>) : null}
+        {userId ? null: (<p>Please wait...</p>)}
+        {joinedRoom ? usersList(users) :  nameInput()}
+      </>
   );
 };
 

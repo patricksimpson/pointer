@@ -31,6 +31,9 @@ const ROOM_HIDE_VOTES = 'room-hide-votes';
 const ROOM_CLEAR_VOTES = 'room-clear-votes';
 const CAST_VOTE = 'cast-vote';
 
+const USERS_ONLINE = 'users-online';
+const ROOMS_ONLINE = 'rooms-online';
+
 const JOINED_ROOM = 'joined-room';
 
 const DEFAULT_NAME = '...';
@@ -42,20 +45,28 @@ function handler (req, res) {}
 
 io.on('connection', function (socket) {
   socket.emit('api', { data: 'Server Online' });
+  adviseRoomsOnline(socket);
+  adviseUsersOnline(socket);
 
   socket.on(START_SESSION, function (data) {
     createRoom(socket, data);
   });
 
+  socket.on(DISCONNECT, function(data){
+    delete users[socket.id];
+    adviseUsersOnline(socket);
+  });
+
   socket.on(JOIN_SESSION, function (data) {
     const roomId = data.roomId;
     let room = getRoom(roomId);
-    users[socket.id] = DEFAULT_NAME;
 
     // Private message to user, room id and user id of current user;
     io.to(socket.id).emit(JOINED_ROOM, { roomId, userId: socket.id});
 
     if(room) {
+      users[socket.id] = DEFAULT_NAME;
+      adviseUsersOnline(socket);
       joinRoom(roomId, socket);
       log(JOIN_ROOM, roomId);
 
@@ -65,11 +76,10 @@ io.on('connection', function (socket) {
       });
 
       socket.on(DISCONNECT, function(data) {
+        delete users[socket.id];
+        adviseUsersOnline(socket);
         leaveRoom(roomId, socket);
         log(LEAVE_ROOM, {roomId, id: socket.id});
-      });
-      socket.on(DISCONNECT, function(data){
-        delete users[socket.id];
       });
       socket.on(UPDATE_NAME, function(data) {
         users[socket.id] = data.name.substring(0, MAX_NAME_LENGTH).trim();
@@ -108,6 +118,7 @@ function getRoom(roomId) {
 
 function getRoomUsers(roomId) {
   let room = getRoom(roomId);
+  if (!room) { return false; }
   return room.users.map((id) => ({id, name: users[id], vote: getVote(id, roomId)}));
 }
 
@@ -119,7 +130,18 @@ function getVote(id, roomId) {
 function leaveRoom(roomId, socket) {
   let room = getRoom(roomId);
   room.users = room.users.filter((user) => user !== socket.id);
+  if (room.users.length < 1) {
+    deleteRoom(roomId);
+    adviseRoomsOnline(socket);
+  }
   adviseRoom(roomId, socket);
+}
+
+function deleteRoom(roomId) {
+  let index = rooms.findIndex((room) => room.id === roomId);
+  if (index > -1) {
+    rooms.splice(index, 1);
+  }
 }
 
 function adviseRoom(roomId, socket) {
@@ -129,6 +151,7 @@ function adviseRoom(roomId, socket) {
 
 function clearVotes(roomId, socket) {
   let roomUsers = getRoomUsers(roomId, socket);
+  if (!roomUsers) { return; }
   roomUsers.forEach((user) => removeVote(user.id));
   adviseRoom(roomId, socket);
 }
@@ -146,10 +169,19 @@ function joinRoom(roomId, socket) {
 
 function createRoom(socket, data) {
   let roomId = makeId(12);
-  socket.emit(CREATE_ROOM, { data: roomId});
+  io.emit(CREATE_ROOM, { data: roomId});
   socket.join(roomId);
   let room = {id: roomId, users: [], showVotes: false};
   rooms.push(room);
+  adviseRoomsOnline(socket);
+}
+
+function adviseUsersOnline(socket) {
+  io.emit(USERS_ONLINE, {users: Object.keys(users).length});
+}
+
+function adviseRoomsOnline(socket) {
+  io.emit(ROOMS_ONLINE, {rooms: rooms.length});
 }
 
 function log(msg, data = null) {

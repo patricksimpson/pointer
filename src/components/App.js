@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import socketIOClient from 'socket.io-client';
 import ReactDOM from 'react-dom';
 import { endpoint } from '../endpoint';
 
@@ -13,6 +14,7 @@ import { Start, Join } from './session';
 import { Room } from './Room';
 
 const App = () => {
+
   return (
     <>
       <Header />
@@ -25,6 +27,9 @@ const App = () => {
           </ul>
         </nav>
         <Switch>
+          <Route path="/join">
+            <Join/>
+          </Route>
           <Route path="/start-session">
             <Start/>
           </Route>
@@ -40,6 +45,27 @@ const App = () => {
       </Router>
     </>
   );
+};
+
+const Stats = () => {
+  const [response, setResponse] = useState(0);
+  const [usersOnline, setUsersOnline] = useState(0);
+  const [roomsOnline, setRoomsOnline] = useState(0);
+
+  useEffect(() => {
+    let socket = socketIOClient(endpoint);
+    socket.on('api', data => console.log('ok', data) || setResponse(data));
+    socket.on('users-online', data => console.log(data) || setUsersOnline(data.users));
+    socket.on('rooms-online', data => console.log(data) || setRoomsOnline(data.rooms));
+  }, []);
+
+  return response ? (
+    <div className="stats">
+      <p>Server Online</p>
+      <p>{usersOnline} users online</p>
+      <p>{roomsOnline} rooms online</p>
+    </div>
+  ) : (<div className="stats"><p>Server Offline</p></div>);
 };
 
 const NoMatch = () => {
@@ -63,7 +89,8 @@ const Home = () => {
   return (
     <>
       <h2>Home</h2>
-      <p>Join or Start a Session...</p>
+      <p><Link to="/join">Join a session</Link> or <Link to="/start-session">Start Session</Link></p>
+      <Stats />
     </>
   );
 }
