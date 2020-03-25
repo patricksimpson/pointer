@@ -2,12 +2,13 @@ import React, { useState, useEffect } from 'react';
 import socketIOClient from 'socket.io-client';
 import { Redirect } from 'react-router-dom';
 
+import { endpoint } from '../../endpoint';
+
 const Start = () => {
   
   const [response, setResponse] = useState(0);
   const [sessionName, setSessionName] = useState('') ;
   const [redirect, setRediect] = useState();
-  const endpoint = 'http://localhost:4001';
   let socket;
 
   useEffect(() => {
