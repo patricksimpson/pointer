@@ -13,71 +13,10 @@ import {
 import { Start, Join } from './session';
 import { Room } from './Room';
 
+import { Stats } from './Stats';
+
 const App = () => {
 
-  return (
-    <>
-      <Header />
-      <Router>
-        <nav>
-          <ul>
-            <li><Link to="/">Home</Link></li>
-            <li><Link to="/start-session">Start Session</Link></li>
-            <li><Link to="/about">About</Link></li>
-          </ul>
-        </nav>
-        <Switch>
-          <Route path="/join">
-            <Join/>
-          </Route>
-          <Route path="/start-session">
-            <Start/>
-          </Route>
-          <Route path="/about">
-            <About/>
-          </Route>
-          <Route path="/room/:roomId" component={Room} />
-          <Route path="/">
-            <Home />
-          </Route>
-          <Route component={NoMatch}/>
-        </Switch>
-      </Router>
-      <Footer />
-    </>
-  );
-};
-
-const Stats = () => {
-  const [response, setResponse] = useState(0);
-  const [usersOnline, setUsersOnline] = useState(0);
-  const [roomsOnline, setRoomsOnline] = useState(0);
-
-  useEffect(() => {
-    let socket = socketIOClient(endpoint);
-    socket.on('api', data => setResponse(data));
-    socket.on('users-online', data => setUsersOnline(data.users));
-    socket.on('rooms-online', data => setRoomsOnline(data.rooms));
-  }, []);
-
-  return response ? (
-    <div className="stats">
-      <p>Server Online</p>
-      <p>{usersOnline} users online</p>
-      <p>{roomsOnline} rooms online</p>
-    </div>
-  ) : (<div className="stats"><p>Server Offline</p></div>);
-};
-
-const NoMatch = () => {
-  return (
-    <div>
-      <h2>404 - Not Found</h2>
-    </div>
-  );
-};
-
-const Header = () => {
   const [mode, setMode] = useState(null);
 
   useEffect(() => {
@@ -112,16 +51,70 @@ const Header = () => {
     }
   };
 
+
   return (
-      <>
-        <h1>Pointer</h1>
-        <span className="toggle">
-          <img className="toggle-button" src="/static/mode-toggle.svg" alt="dark/light mode toggle" title="dark/light mode toggle" height="24px" width="24px" onClick={switchMode}/>
-        </span>
+    <>
+      <Router>
+        <div className="header-wrapper">
+          <Link to="/" className="header">
+            <h1><span>Pointer</span></h1> 
+          </Link>
+          <img src="/static/logo.svg" className="header-icon" />
+          <img src="/static/logo-dark.svg" className="dark-header-icon header-icon" />
+          <span className="toggle">
+            <img className="toggle-button" src="/static/mode-toggle.svg" alt="dark/light mode toggle" title="dark/light mode toggle" height="24px" width="24px" onClick={switchMode}/>
+          </span>
+          <nav className="header-nav">
+            <ul>
+              <li><Link to="/">Home</Link></li>
+              <li><Link to="/start-session">Start Session</Link></li>
+              <li><Link to="/about">About</Link></li>
+            </ul>
+          </nav>
+        </div>
         <div className="subheader">
           <span>A simple agile pointing tool.</span>
         </div>
-      </>
+        <Switch>
+          <Route path="/join">
+            <Join/>
+          </Route>
+          <Route path="/start-session">
+            <Start/>
+          </Route>
+          <Route path="/about">
+            <About/>
+          </Route>
+          <Route path="/room/:roomId" component={Room} />
+          <Route path="/">
+            <Home />
+          </Route>
+          <Route component={NoMatch}/>
+        </Switch>
+      </Router>
+    <Footer />
+    </>
+  );
+};
+
+const Nav = () => (
+
+  <Router>
+  </Router>
+);
+
+const NoMatch = () => {
+  return (
+    <div>
+      <h2>404 - Not Found</h2>
+    </div>
+  );
+};
+
+const Header = () => {
+  return (
+    <>
+    </>
   );
 };
 
@@ -154,7 +147,6 @@ const About = () => {
     </>
   );
 };
-
 
 ReactDOM.render(<App />, document.getElementById('root'));
 
