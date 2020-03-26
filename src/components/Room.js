@@ -116,9 +116,8 @@ const Vote = ({socket, currentVote, setCurrentVote}) => {
         <button onClick={hideVotes}>Hide Votes</button>
         <button onClick={clearVotes}>Clear Votes</button>
       </div>
-      <br />
       <div className="vote-control">
-    {voteSequence.map((v) => (<button key={`key-${v.toString()}`} className={voteClass(v)} onClick={() => castVote(v)}>{v ? v : 'remove vote'}</button>))}
+    {voteSequence.map((v) => (<button key={`key-${v.toString()}`} className={voteClass(v)} onClick={() => castVote(v)}>{v ? v : 'Remove Vote'}</button>))}
       </div>
     </>
   );

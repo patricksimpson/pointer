@@ -43,6 +43,7 @@ const App = () => {
           <Route component={NoMatch}/>
         </Switch>
       </Router>
+      <Footer />
     </>
   );
 };
@@ -118,7 +119,7 @@ const Header = () => {
           <img className="toggle-button" src="/static/mode-toggle.svg" alt="dark/light mode toggle" title="dark/light mode toggle" height="24px" width="24px" onClick={switchMode}/>
         </span>
         <div className="subheader">
-          <span>Pointing tool</span>
+          <span>A simple agile pointing tool</span>
         </div>
       </>
   );
@@ -132,14 +133,23 @@ const Home = () => {
       <Stats />
     </>
   );
-}
+};
+
+const Footer = () => {
+  return (
+    <>
+      <div className="footer"> 2020 <a href="https://patricksimpson.me/about">Patrick Simpson</a></div>
+    </>
+  );
+};
 
 const About = () => {
   return (
     <>
     <h2>About</h2>
-      <p>This is a pointing tool, for story planning</p>
+      <p>This is a free pointing tool, for agile, scrum story planning.</p>
       <p>Created by Patrick Simpson</p>
+      <p></p>
       <p><a href="https://github.com/patricksimpson/pointer">https://github.com/patricksimpson/pointer</a></p>
     </>
   );

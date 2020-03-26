@@ -9,10 +9,20 @@ html, body {
   font-family: 'Roboto', sans-serif;
   padding: 0;
   margin: 0;
-  font-size: 18px;
+  font-size: 20px;
   color: #222;
   background-color: white;
   transition: all 250ms linear;
+}
+
+nav ul {
+  padding: 0;
+}
+
+nav li {
+  display: inline-block;
+  padding-right: 0.5rem;
+
 }
 
 a {
@@ -38,29 +48,6 @@ a:hover {
   background-color: #222;
 }
 
-.toggle-button {
-  margin: 0 0.5em;
-  cursor: pointer;
-  padding: 1rem;
-  position: fixed;
-  right: 1rem;
-  top: 1rem;
-  border-radius: 50%;
-  transition: all 150ms linear;
-  background-color: #eee;
-}
-
-.toggle-button:hover {
-  background-color: #666;
-}
-
-.dark .toggle-button {
-  background-color: #444;
-}
-
-.dark .toggle-button:hover {
-  background-color: #999;
-}
 
 h1, h2, h3 {
   padding: 0;
@@ -77,17 +64,29 @@ h1, h2, h3 {
 .main {
   padding: 2rem;
   flex-grow : 1;
-  max-width: 40em;
-}
+  max-width: 40em;}
 
 
 input {
   border: 1px solid #ccc;
-  padding: 0.25rem 0.75rem;
-} 
+  padding: 0.5rem 1rem;
+  margin-right: 0.25rem;
+  border-radius: 2px;
+}
+
+.dark input {
+  background-color: #444;
+  color: #eee;
+
+}
 
 .current-user {
   font-weight: bold;
+}
+
+.dark .current-user {
+  font-weight: bold;
+  color: #eee;
 }
 
 .user-list {
@@ -109,18 +108,29 @@ input {
   text-align: right;
 }
 
+input {
+}
+
 button {
   display: inline-block;
   overflow: hidden;
-  padding: 0.25rem 0.75rem;
-  border: 1px solid #ccc;
-  margin: 0 0.25rem;
+  border: 0px solid;
+  margin: 0;
+  margin-right: 0.25rem;
+  font-size: 0.75em;
+  padding: 0.5rem 1rem;
+  border-radius: 2px;
+  color: #202129;
+  background-color: #ececec;
+  border: 0px solid;
+  cursor: pointer;
 }
 
 button:hover {
   transition: all 150ms linear;
   opacity: .85;
-  cursor: pointer;
+  color: #202129;
+  background-color: #999;
 }
 
 button:active {
@@ -131,17 +141,6 @@ button:active {
 button:focus {
   outline: 1px dotted #959595;
   outline-offset: -4px;
-}
-
-button {
-  color: #202129;
-  background-color: #f2f2f2;
-}
-
-button:hover {
-  color: #202129;
-  background-color: #e1e2e2;
-  opacity: 1;
 }
 
 button:active {
@@ -169,4 +168,53 @@ button:active {
 .dark button:active {
   background-color: #d5d6d6;
   opacity: 1;
+}
+
+.toggle-button {
+  margin: 0 0.5em;
+  cursor: pointer;
+  padding: 1rem;
+  position: fixed;
+  right: 1rem;
+  top: 1rem;
+  border-radius: 50%;
+  transition: all 150ms linear;
+  background-color: #eee;
+}
+
+.toggle-button:hover {
+  background-color: #666;
+}
+
+.dark .toggle-button {
+  background-color: #444;
+}
+
+.dark .toggle-button:hover {
+  background-color: #999;
+}
+
+.room-control {
+  border-bottom: 1px solid #ccc;
+  padding: 0.5rem 0;
+}
+
+.vote-control {
+  padding: 0.5rem 0;
+}
+.subheader {
+  color: #999;
+  font-size: 0.8rem;
+
+}
+.footer {
+  font-size: 0.65rem;
+  color: #999;
+  width: 100%;
+  margin: 3rem 0;
+  padding: 1rem 0;
+}
+.footer a {
+  color: #777;
+  text-decoration: none;
 }
