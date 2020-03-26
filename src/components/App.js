@@ -91,10 +91,10 @@ const Header = () => {
 
   const switchMode = () => {
     let newMode;
-    if(mode == 2) {
-      newMode = 1;
-    } else {
+    if(mode == 1) {
       newMode = 2;
+    } else {
+      newMode = 1;
     }
     localStorage.setItem('mode', newMode);
     displayMode(newMode);
