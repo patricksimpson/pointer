@@ -25,13 +25,10 @@ html, body {
   color: #333;
 }
 
-.header-wrapper {
-}
-
 @media(min-width: 530px) {
-.header-wrapper {
-    display: flex;
-}
+    .header-wrapper {
+        display: flex;
+    }
 }
 
 .header-nav {
@@ -84,6 +81,7 @@ h1, h2, h3 {
   height: 100%;
   max-width: 55em;
   position: relative;
+  overflow: hidden;
 }
 
 .main {
