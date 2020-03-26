@@ -138,7 +138,7 @@ const Home = () => {
 const Footer = () => {
   return (
     <>
-      <div className="footer"> 2020 <a href="https://patricksimpson.me/about">Patrick Simpson</a></div>
+      <div className="footer"> 2020 | <a href="https://patricksimpson.me/about">Patrick Simpson</a></div>
     </>
   );
 };
