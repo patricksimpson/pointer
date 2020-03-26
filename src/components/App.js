@@ -138,7 +138,7 @@ const Home = () => {
 const Footer = () => {
   return (
     <>
-      <div className="footer"> 2020 | <a href="https://patricksimpson.me/about">Patrick Simpson</a></div>
+      <div className="footer">Built in 2020 | <a href="https://patricksimpson.me/about">Patrick Simpson</a></div>
     </>
   );
 };
@@ -147,7 +147,7 @@ const About = () => {
   return (
     <>
     <h2>About</h2>
-      <p>This is a free pointing tool, for agile, scrum story planning.</p>
+      <p>This is a free pointing tool, for agile/scrum story planning.</p>
       <p>Created by Patrick Simpson</p>
       <p></p>
       <p><a href="https://github.com/patricksimpson/pointer">https://github.com/patricksimpson/pointer</a></p>

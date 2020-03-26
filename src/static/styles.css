@@ -199,6 +199,11 @@ button:active {
   padding: 0.5rem 0;
 }
 
+
+.dark .room-control {
+  border-bottom: 1px solid #444;
+}
+
 .vote-control {
   padding: 0.5rem 0;
 }
@@ -214,6 +219,7 @@ button:active {
   margin: 3rem 0;
   padding: 1rem 0;
 }
+
 .footer a {
   color: #777;
   text-decoration: none;
