@@ -119,7 +119,7 @@ const Header = () => {
           <img className="toggle-button" src="/static/mode-toggle.svg" alt="dark/light mode toggle" title="dark/light mode toggle" height="24px" width="24px" onClick={switchMode}/>
         </span>
         <div className="subheader">
-          <span>A simple agile pointing tool</span>
+          <span>A simple agile pointing tool.</span>
         </div>
       </>
   );
@@ -129,7 +129,7 @@ const Home = () => {
   return (
     <>
       <h2>Home</h2>
-      <p><Link to="/join">Join a session</Link> or <Link to="/start-session">Start Session</Link></p>
+      <p><Link to="/join">Join a Session</Link> or <Link to="/start-session">Start Session</Link></p>
       <Stats />
     </>
   );
@@ -148,7 +148,7 @@ const About = () => {
     <>
     <h2>About</h2>
       <p>This is a free pointing tool, for agile/scrum story planning.</p>
-      <p>Created by Patrick Simpson</p>
+      <p>Created by Patrick Simpson.</p>
       <p></p>
       <p><a href="https://github.com/patricksimpson/pointer">https://github.com/patricksimpson/pointer</a></p>
     </>

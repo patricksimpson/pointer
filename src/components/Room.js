@@ -68,7 +68,7 @@ const Room = () => {
     return (
       <form className="input-name" onSubmit={submitUpdateName}>
         <h3>Your Name</h3>
-        <input type="text" value={name} onChange={updateName} maxLength="26"/> 
+        <input type="text" value={name} onChange={updateName} maxLength="26" placeholder="name"/> 
         <button onClick={submitUpdateName}>Set Name</button>
       </form>
     );
