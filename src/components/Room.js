@@ -68,7 +68,7 @@ const Room = () => {
     return (
       <form className="input-name" onSubmit={submitUpdateName}>
         <h3>Your Name</h3>
-        <input type="text" value={name} onChange={updateName} maxlength="26"/> 
+        <input type="text" value={name} onChange={updateName} maxLength="26"/> 
         <button onClick={submitUpdateName}>Set Name</button>
       </form>
     );
@@ -111,13 +111,13 @@ const Vote = ({socket, currentVote, setCurrentVote}) => {
 
   return (
     <>
-      <div>
+      <div className="room-control">
         <button onClick={showVotes}>Show Votes</button>
         <button onClick={hideVotes}>Hide Votes</button>
         <button onClick={clearVotes}>Clear Votes</button>
       </div>
       <br />
-      <div>
+      <div className="vote-control">
     {voteSequence.map((v) => (<button key={`key-${v.toString()}`} className={voteClass(v)} onClick={() => castVote(v)}>{v ? v : 'remove vote'}</button>))}
       </div>
     </>

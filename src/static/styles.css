@@ -1,6 +1,90 @@
+:root {
+  --color-dark: #333;
+  --color-snow: #FFFFFF;
+  --color-smoke: #e4e4e4;
+  --font-face: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+}
+
 html, body {
   font-family: 'Roboto', sans-serif;
+  padding: 0;
+  margin: 0;
+  font-size: 18px;
+  color: #222;
+  background-color: white;
+  transition: all 250ms linear;
 }
+
+a {
+  color: #555;
+  transition: all 150ms linear;
+}
+
+a:hover {
+  color: #888;
+}
+
+.dark a {
+  color: #888;
+  transition: all 150ms linear;
+}
+
+.dark a:hover {
+  color: #555;
+}
+
+.dark {
+  color: #ccc;
+  background-color: #222;
+}
+
+.toggle-button {
+  margin: 0 0.5em;
+  cursor: pointer;
+  padding: 1rem;
+  position: fixed;
+  right: 1rem;
+  top: 1rem;
+  border-radius: 50%;
+  transition: all 150ms linear;
+  background-color: #eee;
+}
+
+.toggle-button:hover {
+  background-color: #666;
+}
+
+.dark .toggle-button {
+  background-color: #444;
+}
+
+.dark .toggle-button:hover {
+  background-color: #999;
+}
+
+h1, h2, h3 {
+  padding: 0;
+  margin: 0.5rem 0;
+}
+
+.wrapper {
+  margin: 0 auto;
+  display: flex;
+  flex-flow: column;
+  height: 100%;
+}
+
+.main {
+  padding: 2rem;
+  flex-grow : 1;
+  max-width: 40em;
+}
+
+
+input {
+  border: 1px solid #ccc;
+  padding: 0.25rem 0.75rem;
+} 
 
 .current-user {
   font-weight: bold;
@@ -11,7 +95,6 @@ html, body {
 }
 
 .user {
-  width: 30rem;
   display: flex;
   padding: 0.25rem 0.5rem;
   font-size: 1.1rem;
@@ -23,4 +106,67 @@ html, body {
 
 .user-vote {
   width: 25%;
+  text-align: right;
+}
+
+button {
+  display: inline-block;
+  overflow: hidden;
+  padding: 0.25rem 0.75rem;
+  border: 1px solid #ccc;
+  margin: 0 0.25rem;
+}
+
+button:hover {
+  transition: all 150ms linear;
+  opacity: .85;
+  cursor: pointer;
+}
+
+button:active {
+  transition: all 150ms linear;
+  opacity: .75;
+}
+
+button:focus {
+  outline: 1px dotted #959595;
+  outline-offset: -4px;
+}
+
+button {
+  color: #202129;
+  background-color: #f2f2f2;
+}
+
+button:hover {
+  color: #202129;
+  background-color: #e1e2e2;
+  opacity: 1;
+}
+
+button:active {
+  background-color: #d5d6d6;
+  opacity: 1;
+}
+
+.dark button {
+  color: var(--color-snow);
+  background: var(--color-dark);
+}
+
+.dark button:focus {
+  outline: 1px dotted white;
+  outline-offset: -4px;
+}
+
+
+.dark button:hover {
+  color: #202129;
+  background-color: #e1e2e2;
+  opacity: 1;
+}
+
+.dark button:active {
+  background-color: #d5d6d6;
+  opacity: 1;
 }

@@ -77,10 +77,49 @@ const NoMatch = () => {
 };
 
 const Header = () => {
+  const [mode, setMode] = useState(null);
+
+  useEffect(() => {
+    if(mode == null) {
+      let currentMode = localStorage.getItem('mode');
+      if (currentMode == 1 || currentMode == 2) {
+        displayMode(currentMode);
+        setMode(currentMode);
+      }
+    }
+  });
+
+  const switchMode = () => {
+    let newMode;
+    if(mode == 2) {
+      newMode = 1;
+    } else {
+      newMode = 2;
+    }
+    localStorage.setItem('mode', newMode);
+    displayMode(newMode);
+    setMode(newMode);
+  };
+
+  const displayMode = (whichMode) => {
+    if(whichMode == 1) {
+      document.querySelector('html').classList.add('dark');
+      document.querySelector('body').classList.add('dark');
+    } else {
+      document.querySelector('html').classList.remove('dark');
+      document.querySelector('body').classList.remove('dark');
+    }
+  };
+
   return (
       <>
-      <h1>Pointer</h1>
-      <div className="subheader">Pointing tool</div>
+        <h1>Pointer</h1>
+        <span className="toggle">
+          <img className="toggle-button" src="/static/mode-toggle.svg" alt="dark/light mode toggle" title="dark/light mode toggle" height="24px" width="24px" onClick={switchMode}/>
+        </span>
+        <div className="subheader">
+          <span>Pointing tool</span>
+        </div>
       </>
   );
 };
