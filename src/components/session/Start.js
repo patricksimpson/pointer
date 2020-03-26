@@ -16,6 +16,11 @@ const Start = () => {
   useEffect(() => {
     socket = socketIOClient(endpoint);
     socket.on('api', data => setResponse(data));
+
+    return (() => {
+      socket.disconnect();
+      socket = null;
+    });
   }, []);
 
   const startSession = () => {

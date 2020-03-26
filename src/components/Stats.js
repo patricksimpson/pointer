@@ -12,6 +12,9 @@ const Stats = () => {
     socket.on('api', data => setResponse(data));
     socket.on('users-online', data => setUsersOnline(data.users));
     socket.on('rooms-online', data => setRoomsOnline(data.rooms));
+    return (() => {
+      socket.disconnect();
+    });
   }, []);
 
   return response ? (

@@ -19,6 +19,12 @@ const Room = () => {
   const [notFound, setNotFound] = useState(false);
 
   useEffect(() => {
+    if (name === '') {
+      let hasLocalName = localStorage.getItem('name');
+      if (typeof hasLocalName !== 'undefined' && hasLocalName !== null) {
+        setName(hasLocalName);
+      }
+    }
     socket = socketIOClient(endpoint);
     socket.emit('join-session', {roomId});
     socket.on('joined-room', data => {
@@ -35,7 +41,10 @@ const Room = () => {
     });
     socket.on('no-such-room', data => { setNotFound(true); });
     setSession(socket);
-    return () => (socket.emit('leave-room', {roomId}));
+    return (() => {
+      socket.emit('leave-room', {roomId});
+      socket.disconnect();
+    });
   }, []);
 
   const updateName = (e) => {
@@ -51,6 +60,7 @@ const Room = () => {
     socket = session;
     socket.emit('person-update-name', {name});
     setJoinedRoom(true);
+    localStorage.setItem('name', name);
     return true;
   };
 
@@ -68,7 +78,7 @@ const Room = () => {
     return (
       <form className="input-name" onSubmit={submitUpdateName}>
         <h3>Your Name</h3>
-        <input type="text" value={name} onChange={updateName} maxLength="26" placeholder="name"/> 
+        <input autoFocus type="text" value={name} onChange={updateName} maxLength="26" placeholder="name"/> 
         <button onClick={submitUpdateName}>Set Name</button>
       </form>
     );
@@ -78,7 +88,6 @@ const Room = () => {
       <>
         <h2>Room - {roomId}</h2>
         {joinedRoom? (<Vote socket={session} currentVote={currentVote} setCurrentVote={setCurrentVote}/>) : null}
-        {userId ? null: (<p>Please wait...</p>)}
         {joinedRoom ? usersList(users) :  nameInput()}
       </>
   );
@@ -117,7 +126,7 @@ const Vote = ({socket, currentVote, setCurrentVote}) => {
         <button onClick={clearVotes}>Clear Votes</button>
       </div>
       <div className="vote-control">
-    {voteSequence.map((v) => (<button key={`key-${v.toString()}`} className={voteClass(v)} onClick={() => castVote(v)}>{v ? v : 'Remove Vote'}</button>))}
+      {voteSequence.map((v) => (<button key={`key-${v.toString()}`} className={voteClass(v)} onClick={() => castVote(v)}>{v ? v : 'Remove Vote'}</button>))}
       </div>
     </>
   );
