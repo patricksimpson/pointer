@@ -21,7 +21,7 @@ To start the socket server (server):
 
 `node app.js`
 
-## Default Settingss
+## Default Settings
 
 By default, the socketio connection will be on port `4002` and React will run on `9000`.
 
