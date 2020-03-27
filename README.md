@@ -1,6 +1,6 @@
 # Pointer
 
-![](src/static/logo.svg)
+![](src/static/logo.svg | width=64)
 
 A simple agile pointing tool.
 
