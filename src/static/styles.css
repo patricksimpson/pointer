@@ -25,16 +25,17 @@ html, body {
   color: #333;
 }
 
-@media(min-width: 530px) {
+@media(min-width: 550px) {
     .header-wrapper {
         display: flex;
     }
+
+    .header-nav {
+        text-align: right;
+        width: 100%;
+    }
 }
 
-.header-nav {
-  text-align: right;
-  width: 100%;
-}
 
 nav ul {
   padding: 0;
@@ -139,7 +140,7 @@ button {
   display: inline-block;
   overflow: hidden;
   border: 0px solid;
-  margin: 0;
+  margin: 0.25em 0;
   margin-right: 0.25rem;
   font-size: 0.75em;
   padding: 0.5rem 1rem;
