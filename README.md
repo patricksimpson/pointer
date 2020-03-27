@@ -1,6 +1,6 @@
 # Pointer
 
-![](src/static/logo.svg | width=64)
+<img src="https://izerop.com/static/logo.svg" width="64" />
 
 A simple agile pointing tool.
 
