@@ -1,6 +1,8 @@
-# pointer
+# Pointer
 
-A scrum pointing tool.
+![](src/static/logo.svg)
+
+A simple agile pointing tool.
 
 ## Installing
 
