@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Redirect } from 'react-router-dom';
-import { Stats } from '../Stats';
 
 const Join = () => {
 
@@ -25,7 +24,6 @@ const InputSession = ({submitHandler, sessionId, setSessionId}) => {
           <label>Session ID: <br /><input type="text" value={sessionId} placeholder="session id" onChange={handleUpdate} /></label>
           <button>Join Session</button>
         </div>
-        <Stats />
       </div>
       </form>
   );

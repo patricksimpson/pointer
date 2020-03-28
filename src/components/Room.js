@@ -3,6 +3,7 @@ import { Redirect } from 'react-router-dom';
 import { useParams } from 'react-router';
 import socketIOClient from 'socket.io-client';
 import { endpoint } from '../endpoint';
+import { CopyButton } from './CopyButton';
 
 const Room = () => {
   let { roomId } = useParams();
@@ -86,7 +87,10 @@ const Room = () => {
 
   return notFound ? (<><h2>Not found</h2><p> Try another session, or create one!</p></>) : (
       <>
-        <h2>Room - {roomId}</h2>
+        <div className="header-wrapper">
+          <h2 className="heading">Room - {roomId}</h2>
+          <CopyButton />
+        </div>
         {joinedRoom? (<Vote socket={session} currentVote={currentVote} setCurrentVote={setCurrentVote}/>) : null}
         {joinedRoom ? usersList(users) :  nameInput()}
       </>
@@ -130,6 +134,6 @@ const Vote = ({socket, currentVote, setCurrentVote}) => {
       </div>
     </>
   );
-}
+};
 
 export { Room };

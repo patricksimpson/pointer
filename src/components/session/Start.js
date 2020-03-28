@@ -4,8 +4,6 @@ import { Redirect } from 'react-router-dom';
 
 import { endpoint } from '../../endpoint';
 
-import { Stats } from '../Stats';
-
 const Start = () => {
   
   const [response, setResponse] = useState(0);
@@ -40,9 +38,6 @@ const Start = () => {
     <h2>Start Session</h2>
       <div className="box start-session">
         <button onClick={startSession}>Start Session</button>
-        <div> 
-          <Stats />
-        </div>
         {redirect ? (<Redirect to={`/room/${redirect.data}`} />) : null}
       </div>
     </>

@@ -2,16 +2,18 @@ import React, { useState, useEffect } from 'react';
 import { endpoint } from '../endpoint';
 import socketIOClient from 'socket.io-client';
 
-const Stats = () => {
+const ServerStatus = () => {
   const [response, setResponse] = useState(0);
   const [usersOnline, setUsersOnline] = useState(0);
   const [roomsOnline, setRoomsOnline] = useState(0);
 
   useEffect(() => {
     let socket = socketIOClient(endpoint);
-    socket.on('api', data => setResponse(data));
-    socket.on('users-online', data => setUsersOnline(data.users));
-    socket.on('rooms-online', data => setRoomsOnline(data.rooms));
+    socket.on('server-status', data => {
+      setResponse(data.status);
+      setUsersOnline(data.users);
+      setRoomsOnline(data.rooms);
+    });
     return (() => {
       socket.disconnect();
     });
@@ -35,4 +37,4 @@ const BadIcon = () => (
 );
 
 
-export { Stats, GoodIcon, BadIcon };
+export { ServerStatus, GoodIcon, BadIcon };

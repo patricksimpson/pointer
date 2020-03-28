@@ -11,6 +11,8 @@ let rooms = [];
 let users = {};
 let votes = {};
 
+const SERVER_STATUS = 'server-status';
+
 const START_SESSION = 'start-session';
 const JOIN_SESSION = 'join-session';
 
@@ -44,10 +46,7 @@ const MAX_NAME_LENGTH = 26;
 function handler (req, res) {}
 
 io.on('connection', function (socket) {
-  socket.emit('api', { data: 'Server Online' });
-  adviseRoomsOnline(socket);
-  adviseUsersOnline(socket);
-
+  adviseServerStatus(socket);
   socket.on(START_SESSION, function (data) {
     createRoom(socket, data);
   });
@@ -55,7 +54,7 @@ io.on('connection', function (socket) {
   socket.on(DISCONNECT, function(data){
     delete users[socket.id];
     delete votes[socket.id];
-    adviseUsersOnline(socket);
+    adviseServerStatus(socket);
   });
 
   socket.on(JOIN_SESSION, function (data) {
@@ -67,7 +66,7 @@ io.on('connection', function (socket) {
 
     if(room) {
       users[socket.id] = DEFAULT_NAME;
-      adviseUsersOnline(socket);
+      adviseServerStatus(socket);
       joinRoom(roomId, socket);
       log(JOIN_ROOM, roomId);
 
@@ -132,7 +131,7 @@ function leaveRoom(roomId, socket) {
     room.users = room.users.filter((user) => user !== socket.id);
     if (room.users.length < 1) {
       deleteRoom(roomId);
-      adviseRoomsOnline(socket);
+      adviseServerStatus(socket);
     }
     adviseRoom(roomId, socket);
   }
@@ -176,15 +175,25 @@ function createRoom(socket, data) {
   socket.join(roomId);
   let room = {id: roomId, users: [], showVotes: false};
   rooms.push(room);
-  adviseRoomsOnline(socket);
+  adviseServerStatus(socket);
 }
 
-function adviseUsersOnline(socket) {
-  io.emit(USERS_ONLINE, {users: Object.keys(users).length});
+function usersOnline() {
+  return Object.keys(users).length;
 }
 
-function adviseRoomsOnline(socket) {
-  io.emit(ROOMS_ONLINE, {rooms: rooms.length});
+function roomsOnline() {
+  return rooms.length;
+}
+
+function adviseServerStatus(socket) {
+  let data = {
+    status: true,
+    users: usersOnline(),
+    rooms: roomsOnline()
+  };
+  socket.emit(SERVER_STATUS, data);
+  socket.broadcast.emit(SERVER_STATUS, data);
 }
 
 function log(msg, data = null) {

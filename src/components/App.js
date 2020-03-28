@@ -13,7 +13,7 @@ import {
 import { Start, Join } from './session';
 import { Room } from './Room';
 
-import { Stats } from './Stats';
+import { ServerStatus } from './Stats';
 
 const App = () => {
 
@@ -123,7 +123,7 @@ const Home = () => {
     <>
       <h2>Home</h2>
       <p><Link to="/join">Join a Session</Link> or <Link to="/start-session">Start Session</Link></p>
-      <Stats />
+      <ServerStatus />
     </>
   );
 };
