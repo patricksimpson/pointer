@@ -300,31 +300,33 @@ button:active {
   border: 0 none;
   display: inline-block;
   background-color: transparent;
+  padding: 0.5rem 1rem;
   width: 18em;
-  border: 1px solid #ccc;
-  border-radius: 2px;
-  border-rigt: 0px none;
   margin: 0;
-  padding: 10px 20px 8px 20px;
-  border-top-right-radius: 0
-  border-bottom-right-radius: 0
+  border: 0 none;
 }
 
-.dark .copy-text-field {
+.copy-input-wrap {
+  display: inline-block;
+  border-radius: 2px;
+  padding: 0;
+  margin: 0;
+  with: auto;
+  border: 1px solid #ccc;
+}
+
+.dark .copy-input-wrap{
   border-color: #555;
 }
 
 .button-icon {
   background-color: #eee;
   vertical-align: middle;
-  padding: 0.25rem 0.5rem;
-  padding: 0.25rem 0.5rem;
+  padding: 0.5rem;
   margin: 0rem;
-  border-radius: 2px;
-  border: 1px solid #ccc;
   border-left: 0px none;
-  margin-left: -3px;
-  border-top-left-radius: 0
+  margin-left: -1px;
+  border-top-left-radius: 0;
   border-bottom-left-radius: 0
 }
 
