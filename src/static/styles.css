@@ -102,7 +102,7 @@ input {
 .dark input {
   background-color: #444;
   color: #eee;
-
+  border-color: #777;
 }
 
 .current-user {
@@ -310,6 +310,10 @@ button:active {
   border-bottom-right-radius: 0
 }
 
+.dark .copy-text-field {
+  border-color: #555;
+}
+
 .button-icon {
   background-color: #eee;
   vertical-align: middle;
@@ -322,6 +326,11 @@ button:active {
   margin-left: -3px;
   border-top-left-radius: 0
   border-bottom-left-radius: 0
+}
+
+.dark .button-icon{
+  border-color: #555;
+  background-color: #444;
 }
 
 .header-wrapper {
@@ -358,6 +367,11 @@ button:active {
 .button-icon svg {
   height: 1rem;
   width: 1rem;
+}
+
+
+.dark .button-icon svg {
+  fill: #ccc;
 }
 
 .header-icon {
