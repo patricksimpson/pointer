@@ -139,6 +139,16 @@ function leaveRoom(roomId, socket) {
   delete votes[socket.id];
 }
 
+function cleanUpRooms(socket) {
+  rooms.forEach((room) => {
+    let roomUsers = getRoomUsers(room.id);
+    if (roomUsers.length < 1) {
+      deleteRoom(room.id);
+      adviseServerStatus(socket);
+    }
+  });
+}
+
 function deleteRoom(roomId) {
   let index = rooms.findIndex((room) => room.id === roomId);
   if (index > -1) {
