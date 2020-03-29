@@ -98,7 +98,7 @@ const Room = () => {
 };
 
 const Vote = ({socket, currentVote, setCurrentVote}) => {
-  let voteSequence = [false, '0', '0.5', 1, 2, 3, 5, 8, 13, '?'];
+  let voteSequence = [false, '0', '0.5', 1, 2, 3, 5, 8, 13, 21, '?'];
 
 
   const castVote = (vote) => {
