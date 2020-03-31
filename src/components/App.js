@@ -143,7 +143,8 @@ const About = () => {
       <p>This is a free pointing tool, for agile/scrum story planning.</p>
       <p>Created by Patrick Simpson.</p>
       <p></p>
-      <p>Read about <a href="https://patricksimpson.me/posts/pointer/">how to use pointer</a>. This project is also <a href="https://github.com/patricksimpson/pointer">open soure on Github</a>.</p>
+      <p>You can read about <a href="https://patricksimpson.me/posts/pointer/">using pointer here</a>. </p>
+      <p>This project is<a href="https://github.com/patricksimpson/pointer">open soure on Github</a>.</p>
     </>
   );
 };
