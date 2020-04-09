@@ -144,7 +144,7 @@ const About = () => {
       <p>Created by Patrick Simpson.</p>
       <p></p>
       <p>You can read about <a href="https://patricksimpson.me/posts/pointer/">using pointer here</a>. </p>
-      <p>This project is<a href="https://github.com/patricksimpson/pointer">open soure on Github</a>.</p>
+      <p>This project is<a href="https://github.com/patricksimpson/pointer">open source on Github</a>.</p>
     </>
   );
 };
