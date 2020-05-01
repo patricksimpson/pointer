@@ -18,6 +18,7 @@ const Room = () => {
   const [showVotes, setShowVotes] = useState(false);
   const [joinedRoom, setJoinedRoom] = useState(false);
   const [notFound, setNotFound] = useState(false);
+  const [leaderUser, setLeaderUser] = useState(false);
 
   useEffect(() => {
     if (name === '') {
@@ -36,6 +37,9 @@ const Room = () => {
     });
     socket.on('room-hide-votes', data => {
       setShowVotes(false);
+    });
+    socket.on('promoted-user', data => {
+      setLeaderUser(data.id);
     });
     socket.on('person-list', data => {
       setUsers(data.users);
@@ -70,10 +74,15 @@ const Room = () => {
 
   const displayVote = (id, vote) => (showVotes ? vote.toString() : (userId === id ? currentVote : (vote ? 'voted' : 'not voted')));
 
+  const promote = () => {
+    socket = session;
+    socket.emit('promote-user', {userId});
+  };
+
   const usersList = (users) => {
     return(
       <ul className="user-list"> 
-        {users ? users.map((user) => (<li key={user.id} className={`user${user.id === userId ? ' current-user' : ''}`}><span className='user-name'>{user.name}</span><span className='user-vote'>{user.vote ? displayVote(user.id, user.vote) : 'not voted' }</span></li>)) : (<li>No one here...</li>)}
+        {users ? users.map((user) => (<li key={user.id} className={`user${user.id === userId ? ' current-user' : ''}${user.leaderUser ? ' leader' : ''}`}>{user.leaderUser ? <Leader /> : '' }<span className='user-name'>{user.name}</span><span className='user-vote'>{user.vote ? displayVote(user.id, user.vote) : 'not voted' }</span></li>)) : (<li>No one here...</li>)}
       </ul>
     );
   };
@@ -94,13 +103,13 @@ const Room = () => {
           <h2 className="heading">Room - {roomId}</h2>
           <CopyButton />
         </div>
-        {joinedRoom? (<Vote socket={session} currentVote={currentVote} setCurrentVote={setCurrentVote}/>) : null}
+        {joinedRoom? (<Vote socket={session} currentVote={currentVote} setCurrentVote={setCurrentVote} leaderUser={leaderUser == userId} promote={promote} />) : null}
         {joinedRoom ? usersList(users) :  nameInput()}
       </>
   );
 };
 
-const Vote = ({socket, currentVote, setCurrentVote}) => {
+const Vote = ({socket, currentVote, setCurrentVote, leaderUser, promote}) => {
   let voteSequence = [false, '0', '0.5', 1, 2, 3, 5, 8, 13, 21, '?'];
 
 
@@ -128,14 +137,26 @@ const Vote = ({socket, currentVote, setCurrentVote}) => {
   return (
     <>
       <div className="room-control">
-        <button onClick={showVotes}>Show Votes</button>
-        <button onClick={hideVotes}>Hide Votes</button>
-        <button onClick={clearVotes}>Clear Votes</button>
+        {leaderUser ? (
+        <>
+          <button onClick={showVotes}>Show Votes</button>
+          <button onClick={hideVotes}>Hide Votes</button>
+          <button onClick={clearVotes}>Clear Votes</button>
+        </>
+      ) : (<button onClick={promote}>Take Leader</button>)}
       </div>
       <div className="vote-control">
       {voteSequence.map((v) => (<button key={`key-${v.toString()}`} className={voteClass(v)} onClick={() => castVote(v)}>{v ? v : 'Remove Vote'}</button>))}
       </div>
     </>
+  );
+};
+
+const Leader = () => {
+  return (
+    <div className="crown icon">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M16.896 10l-4.896-8-4.896 8-7.104-4 3 11v5h18v-5l3-11-7.104 4zm-11.896 10v-2h14v2h-14zm14.2-4h-14.4l-1.612-5.909 4.615 2.598 4.197-6.857 4.197 6.857 4.615-2.598-1.612 5.909z"/></svg> 
+    </div>
   );
 };
 
