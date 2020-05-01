@@ -25,6 +25,8 @@ const UPDATE_NAME = 'person-update-name';
 const UPDATE_ROOM = 'person-list';
 const PERSON_JOIN = 'person-joined';
 const NO_ROOM = 'no-such-room';
+const PROMOTE_USER = 'promote-user';
+const PROMOTED_USER = 'promoted-user';
 
 
 // Voting
@@ -62,7 +64,7 @@ io.on('connection', function (socket) {
     let room = getRoom(roomId);
 
     // Private message to user, room id and user id of current user;
-    io.to(socket.id).emit(JOINED_ROOM, { roomId, userId: socket.id});
+    io.to(socket.id).emit(JOINED_ROOM, { roomId, userId: socket.id });
 
     if(room) {
       users[socket.id] = DEFAULT_NAME;
@@ -81,6 +83,10 @@ io.on('connection', function (socket) {
       });
       socket.on(UPDATE_NAME, function(data) {
         users[socket.id] = data.name.substring(0, MAX_NAME_LENGTH).trim();
+        adviseRoom(roomId, socket);
+      });
+      socket.on(PROMOTE_USER, function(data) {
+        promoteUser(roomId, data.userId);
         adviseRoom(roomId, socket);
       });
       socket.on(CAST_VOTE, function(data) {
@@ -117,7 +123,12 @@ function getRoom(roomId) {
 function getRoomUsers(roomId) {
   let room = getRoom(roomId);
   if (!room) { return false; }
-  return room.users.map((id) => ({id, name: users[id], vote: getVote(id, roomId)}));
+  return room.users.map((id) => ({id, name: users[id], vote: getVote(id, roomId), leaderUser: getLeaderUser(id, roomId) }));
+}
+
+function getLeaderUser(id, roomId) {
+  let room = getRoom(roomId);
+  return room.leaderUser === id;
 }
 
 function getVote(id, roomId) {
@@ -172,8 +183,19 @@ function removeVote(id) {
   votes[id] = null;
 }
 
+function promoteUser(roomId, socketId){
+  let room = getRoom(roomId);
+  room.leaderUser = socketId;
+  io.to(roomId).emit(PROMOTED_USER, { id: socketId });
+}
+
 function joinRoom(roomId, socket) {
   let room = getRoom(roomId);
+  if(room.users < 1) {
+    setTimeout( ()=> {
+      promoteUser(roomId, socket.id);
+    }, 150);
+  }
   room.users.push(socket.id);
   socket.join(roomId);
   adviseRoom(roomId, socket);

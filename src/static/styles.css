@@ -395,3 +395,7 @@ button:active {
 .dark .dark-header-icon {
   display: inline;
 }
+
+.crown {
+  padding-right: 1rem;
+}
