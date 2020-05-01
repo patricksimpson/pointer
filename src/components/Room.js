@@ -76,7 +76,10 @@ const Room = () => {
 
   const promote = () => {
     socket = session;
-    socket.emit('promote-user', {userId});
+    let leadConfirm = confirm("Are you sure you want to take lead of this room?");
+    if (leadConfirm) {
+      socket.emit('promote-user', {userId});
+    }
   };
 
   const usersList = (users) => {
@@ -143,7 +146,7 @@ const Vote = ({socket, currentVote, setCurrentVote, leaderUser, promote}) => {
           <button onClick={hideVotes}>Hide Votes</button>
           <button onClick={clearVotes}>Clear Votes</button>
         </>
-      ) : (<button onClick={promote}>Take Leader</button>)}
+      ) : (<button onClick={promote}>Take Lead</button>)}
       </div>
       <div className="vote-control">
       {voteSequence.map((v) => (<button key={`key-${v.toString()}`} className={voteClass(v)} onClick={() => castVote(v)}>{v ? v : 'Remove Vote'}</button>))}
@@ -154,7 +157,7 @@ const Vote = ({socket, currentVote, setCurrentVote, leaderUser, promote}) => {
 
 const Leader = () => {
   return (
-    <div className="crown icon">
+    <div className="crown icon" title="This is the leader. Leader controls showing, hiding, and clearning votes. There can only be one leader at a time.">
       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M16.896 10l-4.896-8-4.896 8-7.104-4 3 11v5h18v-5l3-11-7.104 4zm-11.896 10v-2h14v2h-14zm14.2-4h-14.4l-1.612-5.909 4.615 2.598 4.197-6.857 4.197 6.857 4.615-2.598-1.612 5.909z"/></svg> 
     </div>
   );

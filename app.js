@@ -87,6 +87,7 @@ io.on('connection', function (socket) {
       });
       socket.on(PROMOTE_USER, function(data) {
         promoteUser(roomId, data.userId);
+        adviseRoom(roomId, socket);
       });
       socket.on(CAST_VOTE, function(data) {
         votes[socket.id] = data.vote;
@@ -191,7 +192,9 @@ function promoteUser(roomId, socketId){
 function joinRoom(roomId, socket) {
   let room = getRoom(roomId);
   if(room.users < 1) {
-    promoteUser(roomId, socket.id);
+    setTimeout( ()=> {
+      promoteUser(roomId, socket.id);
+    }, 150);
   }
   room.users.push(socket.id);
   socket.join(roomId);
