@@ -397,5 +397,6 @@ button:active {
 }
 
 .crown {
-  padding-right: 1rem;
+  position: absolute;
+  left: 0.75rem;
 }
