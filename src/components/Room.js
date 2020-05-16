@@ -19,6 +19,7 @@ const Room = () => {
   const [joinedRoom, setJoinedRoom] = useState(false);
   const [notFound, setNotFound] = useState(false);
   const [leaderUser, setLeaderUser] = useState(false);
+  const [waffledUser, setWaffledUser] = useState(false);
 
   useEffect(() => {
     if (name === '') {
@@ -85,7 +86,7 @@ const Room = () => {
   const usersList = (users) => {
     return(
       <ul className="user-list"> 
-        {users ? users.map((user) => (<li key={user.id} className={`user${user.id === userId ? ' current-user' : ''}${user.leaderUser ? ' leader' : ''}`}>{user.leaderUser ? <Leader /> : '' }<span className='user-name'>{user.name}</span><span className='user-vote'>{user.vote ? displayVote(user.id, user.vote) : 'not voted' }</span></li>)) : (<li>No one here...</li>)}
+        {users ? users.map((user) => (<li key={user.id} className={`user${user.id === userId ? ' current-user' : ''}${user.leaderUser ? ' leader' : ''}`}>{showVotes && waffledUser ? <Waffle /> : ''}<span className='user-name'>{user.name}</span>{user.leaderUser ? <Leader /> : '' }<span className='user-vote'>{user.vote ? displayVote(user.id, user.vote) : 'not voted' }</span></li>)) : (<li>No one here...</li>)}
       </ul>
     );
   };
@@ -106,30 +107,34 @@ const Room = () => {
           <h2 className="heading">Room - {roomId}</h2>
           <CopyButton />
         </div>
-        {joinedRoom? (<Vote socket={session} currentVote={currentVote} setCurrentVote={setCurrentVote} leaderUser={leaderUser == userId} promote={promote} />) : null}
+        {joinedRoom? (<Vote socket={session} currentVote={currentVote} setCurrentVote={setCurrentVote} setWaffledUser={setWaffledUser} leaderUser={leaderUser == userId} promote={promote} />) : null}
         {joinedRoom ? usersList(users) :  nameInput()}
       </>
   );
 };
 
-const Vote = ({socket, currentVote, setCurrentVote, leaderUser, promote}) => {
+const Vote = ({socket, currentVote, setCurrentVote, setWaffledUser, leaderUser, promote}) => {
   let voteSequence = [false, '0', '0.5', 1, 2, 3, 5, 8, 13, 21, '?'];
 
 
   const castVote = (vote) => {
+    setWaffledUser(currentVote != -1 && currentVote != vote);
     setCurrentVote(vote);
     socket.emit('cast-vote', {vote: vote});
   };
 
   const clearVotes = () => {
+    setWaffledUser(false);
     socket.emit('room-clear-votes');
   };
 
   const showVotes = () => {
+    setWaffledUser(false);
     socket.emit('room-show-votes');
   };
 
   const hideVotes = () => {
+    setWaffledUser(false);
     socket.emit('room-hide-votes');
   };
 
@@ -162,5 +167,16 @@ const Leader = () => {
     </div>
   );
 };
+
+const Waffle = () => {
+  return (
+    <div className="waffle icon">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 64 64" xlinkHref="http://www.w3.org/1999/xlink">
+        <path data-name="layer2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M40.5 3.2L3.2 40.5m50.6-29.1L11.3 53.8m50-28.6l-36.1 36M22.7 3.5l37.8 37.8M9.6 11.9L52 54.3M2.6 26.1l35.3 35.4"></path>
+        <circle data-name="layer1" cx="32" cy="32" r="30" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="4"></circle>
+      </svg>
+    </div>
+  )
+}
 
 export { Room };
