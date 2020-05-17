@@ -11,6 +11,7 @@ html, body {
   margin: 0;
   font-size: 20px;
   color: #222;
+  stroke: #222;
   background-color: white;
   transition: all 250ms linear;
 }
@@ -67,6 +68,7 @@ a:hover {
 .dark {
   color: #ccc;
   background-color: #222;
+  stroke: #ccc;
 }
 
 
@@ -207,12 +209,22 @@ button:active {
   background-color: #eee;
 }
 
+@media(max-width: 1023px) {
+  .waffle {
+    position: absolute;
+    right: 5.5rem;
+  }
+}
 
 @media(min-width: 1024px) {
-
   .toggle-button {
     right: 1rem;
     top: 1rem;
+  }
+
+  .waffle {
+    position: absolute;
+    right: 10.5rem;
   }
 }
 
