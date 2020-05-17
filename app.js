@@ -10,6 +10,7 @@ app.listen(port);
 let rooms = [];
 let users = {};
 let votes = {};
+let waffles = {};
 
 const SERVER_STATUS = 'server-status';
 
@@ -56,6 +57,7 @@ io.on('connection', function (socket) {
   socket.on(DISCONNECT, function(data){
     delete users[socket.id];
     delete votes[socket.id];
+    delete waffles[socket.id];
     adviseServerStatus(socket);
   });
 
@@ -90,21 +92,28 @@ io.on('connection', function (socket) {
         adviseRoom(roomId, socket);
       });
       socket.on(CAST_VOTE, function(data) {
+        waffled = votes[socket.id] != -1 && 
+                  votes[socket.id] != data.vote && 
+                  data.vote != false
+        waffles[socket.id] = waffled
         votes[socket.id] = data.vote;
         adviseRoom(roomId, socket);
       });
       socket.on(ROOM_SHOW_VOTES, function(data) {
         room.showVotes = true;
+        waffles = {}
         adviseRoom(roomId, socket);
         io.to(roomId).emit(ROOM_SHOW_VOTES);
       });
       socket.on(ROOM_HIDE_VOTES, function(data) {
         room.showVotes = false;
+        waffles = {}
         adviseRoom(roomId, socket);
         io.to(roomId).emit(ROOM_HIDE_VOTES);
       });
       socket.on(ROOM_CLEAR_VOTES, function(data) {
         room.showVotes = false;
+        waffles = {}
         clearVotes(roomId, socket);
         io.to(roomId).emit(ROOM_HIDE_VOTES);
       });
@@ -123,7 +132,7 @@ function getRoom(roomId) {
 function getRoomUsers(roomId) {
   let room = getRoom(roomId);
   if (!room) { return false; }
-  return room.users.map((id) => ({id, name: users[id], vote: getVote(id, roomId), leaderUser: getLeaderUser(id, roomId) }));
+  return room.users.map((id) => ({id, name: users[id], vote: getVote(id, roomId), leaderUser: getLeaderUser(id, roomId), waffled: getWaffled(id) }));
 }
 
 function getLeaderUser(id, roomId) {
@@ -134,6 +143,10 @@ function getLeaderUser(id, roomId) {
 function getVote(id, roomId) {
   let room = getRoom(roomId);
   return room.showVotes ? votes[id] : !!votes[id];
+}
+
+function getWaffled(id) {
+  return waffles[id];
 }
 
 function leaveRoom(roomId, socket) {
@@ -148,6 +161,7 @@ function leaveRoom(roomId, socket) {
   }
   delete users[socket.id];
   delete votes[socket.id];
+  delete waffles[socket.id];
 }
 
 function cleanUpRooms(socket) {
@@ -181,6 +195,7 @@ function clearVotes(roomId, socket) {
 
 function removeVote(id) {
   votes[id] = null;
+  waffles[id] = null;
 }
 
 function promoteUser(roomId, socketId){

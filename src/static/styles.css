@@ -209,12 +209,22 @@ button:active {
   background-color: #eee;
 }
 
+@media(max-width: 1023px) {
+  .waffle {
+    position: absolute;
+    right: 5.5rem;
+  }
+}
 
 @media(min-width: 1024px) {
-
   .toggle-button {
     right: 1rem;
     top: 1rem;
+  }
+
+  .waffle {
+    position: absolute;
+    right: 10.5rem;
   }
 }
 
@@ -401,9 +411,4 @@ button:active {
 .crown {
   position: absolute;
   left: 0.75rem;
-}
-
-.waffle {
-  position: absolute;
-  right: 5.5rem;
 }
