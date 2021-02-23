@@ -1,5 +1,7 @@
 # Pointer
 
+See it live, [https://izerop.com](https://izerop.com).
+
 <img src="https://izerop.com/static/logo.svg" width="64" />
 
 A simple agile pointing tool.
