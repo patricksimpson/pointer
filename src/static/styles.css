@@ -415,3 +415,15 @@ button:active {
 .me.icon {
   padding-right: 0.5rem;
 }
+.vote-button {
+  border: 1px solid transparent;
+} 
+.current-vote {
+  border: 1px solid #999;
+  background-color: #cdcdcd;
+}
+.dark .current-vote {
+  border: 1px solid #ccc;
+  background-color: #999;
+}
+

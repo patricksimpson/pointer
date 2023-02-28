@@ -37,6 +37,7 @@ const Room = () => {
     });
     socket.on("room-hide-votes", (data) => {
       setShowVotes(false);
+      setCurrentVote(-1);
     });
     socket.on("promoted-user", (data) => {
       setLeaderUser(data.id);
@@ -190,10 +191,14 @@ const Vote = ({
   promote,
   isShowing,
 }) => {
-  let voteSequence = [-1, "0", "0.5", 1, 2, 3, 5, 8, 13, 21, "?"];
+  let voteSequence = [false, "0", "0.5", 1, 2, 3, 5, 8, 13, 21, "?"];
 
   const castVote = (vote) => {
-    setCurrentVote(vote);
+    if (!vote) {
+      setCurrentVote(-1);
+    } else {
+      setCurrentVote(vote);
+    }
     socket.emit("cast-vote", { vote: vote });
   };
 
@@ -233,10 +238,10 @@ const Vote = ({
         {voteSequence.map((v) => (
           <button
             key={`key-${v.toString()}`}
-            className={voteClass(v)}
+            className={`vote-button ${voteClass(v)}`}
             onClick={() => castVote(v)}
           >
-            {v >= 0 ? v : "Remove Vote"}
+            {v ? v : "Remove Vote"}
           </button>
         ))}
       </div>
