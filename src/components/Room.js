@@ -101,7 +101,7 @@ const Room = () => {
       currentVote >= 0 ? (
         <span>You voted: {currentVote}</span>
       ) : (
-        <span>Please vote...</span>
+        <span>Voting in progress...</span>
       );
     return buffer;
   };
@@ -109,7 +109,7 @@ const Room = () => {
   const usersList = (users) => {
     return (
       <>
-        <div>{showVotes ? <span>Voting Complete</span> : ok()}</div>
+        <div>{showVotes ? <span>Voting complete!</span> : ok()}</div>
         <ul className="user-list">
           {users ? (
             users.map((user) => (

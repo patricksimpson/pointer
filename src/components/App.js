@@ -1,27 +1,21 @@
-import React, { useState, useEffect } from 'react';
-import socketIOClient from 'socket.io-client';
-import ReactDOM from 'react-dom';
-import { endpoint } from '../endpoint';
+import React, { useState, useEffect } from "react";
+import socketIOClient from "socket.io-client";
+import ReactDOM from "react-dom";
+import { endpoint } from "../endpoint";
 
-import {
-  BrowserRouter as Router,
-  Route,
-  Switch,
-  Link
-} from 'react-router-dom';
+import { BrowserRouter as Router, Route, Switch, Link } from "react-router-dom";
 
-import { Start, Join } from './session';
-import { Room } from './Room';
+import { Start, Join } from "./session";
+import { Room } from "./Room";
 
-import { ServerStatus } from './Stats';
+import { ServerStatus } from "./Stats";
 
 const App = () => {
-
   const [mode, setMode] = useState(null);
 
   useEffect(() => {
-    if(mode == null) {
-      let currentMode = localStorage.getItem('mode');
+    if (mode == null) {
+      let currentMode = localStorage.getItem("mode");
       if (currentMode == 1 || currentMode == 2) {
         displayMode(currentMode);
         setMode(currentMode);
@@ -31,44 +25,62 @@ const App = () => {
 
   const switchMode = () => {
     let newMode;
-    if(mode == 1) {
+    if (mode == 1) {
       newMode = 2;
     } else {
       newMode = 1;
     }
-    localStorage.setItem('mode', newMode);
+    localStorage.setItem("mode", newMode);
     displayMode(newMode);
     setMode(newMode);
   };
 
   const displayMode = (whichMode) => {
-    if(whichMode == 1) {
-      document.querySelector('html').classList.add('dark');
-      document.querySelector('body').classList.add('dark');
+    if (whichMode == 1) {
+      document.querySelector("html").classList.add("dark");
+      document.querySelector("body").classList.add("dark");
     } else {
-      document.querySelector('html').classList.remove('dark');
-      document.querySelector('body').classList.remove('dark');
+      document.querySelector("html").classList.remove("dark");
+      document.querySelector("body").classList.remove("dark");
     }
   };
-
 
   return (
     <>
       <Router>
         <div className="header-wrapper">
           <Link to="/" className="header">
-            <h1><span>Pointer</span></h1> 
+            <h1>
+              <span>Pointer</span>
+            </h1>
           </Link>
           <img src="/static/logo.svg" className="header-icon" />
-          <img src="/static/logo-dark.svg" className="dark-header-icon header-icon" />
+          <img
+            src="/static/logo-dark.svg"
+            className="dark-header-icon header-icon"
+          />
           <span className="toggle">
-            <img className="toggle-button" src="/static/mode-toggle.svg" alt="dark/light mode toggle" title="dark/light mode toggle" height="24px" width="24px" onClick={switchMode}/>
+            <img
+              className="toggle-button"
+              src="/static/mode-toggle.svg"
+              alt="dark/light mode toggle"
+              title="dark/light mode toggle"
+              height="24px"
+              width="24px"
+              onClick={switchMode}
+            />
           </span>
           <nav className="header-nav">
             <ul>
-              <li><Link to="/">Home</Link></li>
-              <li><Link to="/start-session">Start Session</Link></li>
-              <li><Link to="/about">About</Link></li>
+              <li>
+                <Link to="/">Home</Link>
+              </li>
+              <li>
+                <Link to="/start-session">Start Session</Link>
+              </li>
+              <li>
+                <Link to="/about">About</Link>
+              </li>
             </ul>
           </nav>
         </div>
@@ -77,31 +89,27 @@ const App = () => {
         </div>
         <Switch>
           <Route path="/join">
-            <Join/>
+            <Join />
           </Route>
           <Route path="/start-session">
-            <Start/>
+            <Start />
           </Route>
           <Route path="/about">
-            <About/>
+            <About />
           </Route>
           <Route path="/room/:roomId" component={Room} />
           <Route path="/">
             <Home />
           </Route>
-          <Route component={NoMatch}/>
+          <Route component={NoMatch} />
         </Switch>
       </Router>
-    <Footer />
+      <Footer />
     </>
   );
 };
 
-const Nav = () => (
-
-  <Router>
-  </Router>
-);
+const Nav = () => <Router></Router>;
 
 const NoMatch = () => {
   return (
@@ -112,17 +120,17 @@ const NoMatch = () => {
 };
 
 const Header = () => {
-  return (
-    <>
-    </>
-  );
+  return <></>;
 };
 
 const Home = () => {
   return (
     <>
       <h2>Home</h2>
-      <p><Link to="/join">Join a Session</Link> or <Link to="/start-session">Start Session</Link></p>
+      <p>
+        <Link to="/join">Join a Session</Link> or{" "}
+        <Link to="/start-session">Start Session</Link>
+      </p>
       <ServerStatus />
     </>
   );
@@ -131,7 +139,10 @@ const Home = () => {
 const Footer = () => {
   return (
     <>
-      <div className="footer">Built in 2020 | <a href="https://patricksimpson.me/about">Patrick Simpson</a></div>
+      <div className="footer">
+        Built in 2020 |{" "}
+        <a href="https://patricksimpson.me/about">Patrick Simpson</a>
+      </div>
     </>
   );
 };
@@ -139,15 +150,38 @@ const Footer = () => {
 const About = () => {
   return (
     <>
-    <h2>About</h2>
+      <h2>About</h2>
       <p>This is a free pointing tool, for agile/scrum story planning.</p>
       <p>Created by Patrick Simpson.</p>
       <p></p>
-      <p>You can read about <a href="https://patricksimpson.me/posts/pointer/">using pointer here</a>. This project is <a href="https://github.com/patricksimpson/pointer">open source on GitHub</a>.</p>
+      <p>
+        You can read about{" "}
+        <a href="https://github.com/patricksimpson/pointer/blob/master/HOWTO.md">
+          using pointer here
+        </a>
+        . This project is{" "}
+        <a href="https://github.com/patricksimpson/pointer">
+          open source on GitHub
+        </a>
+        .
+      </p>
+      <h2>Support</h2>
+      <p>
+        This tool is free to use! However, please consider supporting me{" "}
+        <a href="https://www.buymeacoffee.com/patricksimpson">
+          https://www.buymeacoffee.com/patricksimpson
+        </a>{" "}
+        ☕🚀! Thank you!
+      </p>
+
+      <p>
+        If you need help with pointer or have a suggestion file an issue on{" "}
+        <a href="https://github.com/patricksimpson/pointer/issues">GitHub</a>!{" "}
+      </p>
     </>
   );
 };
 
-ReactDOM.render(<App />, document.getElementById('root'));
+ReactDOM.render(<App />, document.getElementById("root"));
 
 export default App;

@@ -1,30 +1,29 @@
-import React, { useState, useEffect } from 'react';
-import socketIOClient from 'socket.io-client';
-import { Redirect } from 'react-router-dom';
+import React, { useState, useEffect } from "react";
+import socketIOClient from "socket.io-client";
+import { Redirect } from "react-router-dom";
 
-import { endpoint } from '../../endpoint';
+import { endpoint } from "../../endpoint";
 
 const Start = () => {
-  
   const [response, setResponse] = useState(0);
-  const [sessionName, setSessionName] = useState('') ;
+  const [sessionName, setSessionName] = useState("");
   const [redirect, setRediect] = useState();
   let socket;
 
   useEffect(() => {
     socket = socketIOClient(endpoint);
-    socket.on('api', data => setResponse(data));
+    socket.on("api", (data) => setResponse(data));
 
-    return (() => {
+    return () => {
       socket.disconnect();
       socket = null;
-    });
+    };
   }, []);
 
   const startSession = () => {
     socket = socketIOClient(endpoint);
-    socket.emit('start-session', {sessionName: null});
-    socket.on('create-room', data => {
+    socket.emit("start-session", { sessionName: null });
+    socket.on("create-room", (data) => {
       setRediect(data);
     });
   };
@@ -35,10 +34,10 @@ const Start = () => {
 
   return (
     <>
-    <h2>Start Session</h2>
+      <h2>Start Session</h2>
       <div className="box start-session">
         <button onClick={startSession}>Start Session</button>
-        {redirect ? (<Redirect to={`/room/${redirect.data}`} />) : null}
+        {redirect ? <Redirect to={`/room/${redirect.data}`} /> : null}
       </div>
     </>
   );

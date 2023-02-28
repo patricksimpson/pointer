@@ -412,9 +412,6 @@ button:active {
   position: absolute;
   left: 0.75rem;
 }
-.me.icon {
-  padding-right: 0.5rem;
-}
 .vote-button {
   border: 1px solid transparent;
 } 
