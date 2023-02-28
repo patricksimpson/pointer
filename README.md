@@ -1,8 +1,8 @@
 # Pointer
 
-See it live, [https://izerop.com](https://izerop.com).
+See it live, [https://pointer.bet](https://pointer.bet).
 
-<img src="https://izerop.com/static/logo.svg" width="64" />
+<img src="https://pointer.bet/static/logo.svg" width="64" />
 
 A simple agile pointing tool.
 
