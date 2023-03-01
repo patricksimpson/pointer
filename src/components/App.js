@@ -166,14 +166,14 @@ const About = () => {
         .
       </p>
       <h2>Support</h2>
+      <p>This tool is free to use, enjoy!</p>
       <p>
-        This tool is free to use! However, please consider supporting me{" "}
+        If you find some value in this tool, please consider supporting me{" "}
         <a href="https://www.buymeacoffee.com/patricksimpson">
           https://www.buymeacoffee.com/patricksimpson
         </a>{" "}
-        ☕🚀! Thank you!
       </p>
-
+      <p>Thank you ☕!</p>
       <p>
         If you need help with pointer or have a suggestion file an issue on{" "}
         <a href="https://github.com/patricksimpson/pointer/issues">GitHub</a>!{" "}

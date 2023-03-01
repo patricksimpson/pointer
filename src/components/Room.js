@@ -9,6 +9,18 @@ const Room = () => {
   let { roomId } = useParams();
   let socket;
   let isNameSet = false;
+  let voteSequenceV = [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+  ];
 
   const [currentVote, setCurrentVote] = useState(-1);
   const [session, setSession] = useState();
@@ -19,6 +31,7 @@ const Room = () => {
   const [joinedRoom, setJoinedRoom] = useState(false);
   const [notFound, setNotFound] = useState(false);
   const [leaderUser, setLeaderUser] = useState(false);
+  const [roomVoteList, setRoomVoteList] = useState(voteSequenceV);
 
   useEffect(() => {
     if (name === "") {
@@ -43,6 +56,7 @@ const Room = () => {
       setLeaderUser(data.id);
     });
     socket.on("person-list", (data) => {
+      setRoomVoteList(data.votes);
       setUsers(data.users);
     });
     socket.on("no-such-room", (data) => {
@@ -122,8 +136,7 @@ const Room = () => {
                 {displayWaffle(user.vote, user.waffled) ? <Waffle /> : ""}
 
                 <span className="user-name">
-                  {user.id === userId ? <Me /> : ""}
-                  {user.name}
+                  {user.id === userId ? <Me /> : ""} {user.name}
                 </span>
                 {user.leaderUser ? <Leader /> : ""}
                 <span className="user-vote">
@@ -175,6 +188,7 @@ const Room = () => {
           leaderUser={leaderUser == userId}
           promote={promote}
           isShowing={showVotes}
+          roomVoteList={roomVoteList}
         />
       ) : null}
 
@@ -190,6 +204,7 @@ const Vote = ({
   leaderUser,
   promote,
   isShowing,
+  roomVoteList,
 }) => {
   let voteSequence = [false, "0", "0.5", 1, 2, 3, 5, 8, 13, 21, "?"];
 
@@ -214,7 +229,10 @@ const Vote = ({
     socket.emit("room-hide-votes");
   };
 
-  const voteClass = (v) => {
+  const voteClass = (v, i) => {
+    if (i > 0) {
+      if (!roomVoteList[i - 1]) return `vote-hide`;
+    }
     return `vote${v === currentVote ? " current-vote" : ""}`;
   };
 
@@ -235,10 +253,10 @@ const Vote = ({
         )}
       </div>
       <div className="vote-control">
-        {voteSequence.map((v) => (
+        {voteSequence.map((v, i) => (
           <button
             key={`key-${v.toString()}`}
-            className={`vote-button ${voteClass(v)}`}
+            className={`vote-button ${voteClass(v, i)}`}
             onClick={() => castVote(v)}
           >
             {v ? v : "Remove Vote"}
@@ -270,7 +288,7 @@ const Leader = () => {
 const Me = () => {
   return (
     <span className="me icon" title="You">
-      @
+      (Me)
     </span>
   );
 };

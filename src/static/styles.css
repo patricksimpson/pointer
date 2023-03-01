@@ -414,7 +414,10 @@ button:active {
 }
 .vote-button {
   border: 1px solid transparent;
-} 
+}
+.vote-hide {
+  display: none;
+}
 .current-vote {
   border: 1px solid #999;
   background-color: #cdcdcd;
