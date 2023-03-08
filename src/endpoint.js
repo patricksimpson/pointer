@@ -1,3 +1,3 @@
-const endpoint = `//${process.env.END_POINT || 'localhost'}:${process.env.PORT || 4002}`;
-
+var host = window.location.hostname; 
+const endpoint = `//${process.env.END_POINT || host}:${process.env.PORT || 4002}`;
 export { endpoint };

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import socketIOClient from "socket.io-client";
-import { Redirect } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 
 import { endpoint } from "../../endpoint";
 
@@ -96,7 +96,7 @@ const Start = () => {
           ))}
         </div>
         <button onClick={startSession}>Start Session</button>
-        {redirect ? <Redirect to={`/room/${redirect.data}`} /> : null}
+        {redirect ? <Navigate to={`/room/${redirect.data}`} /> : null}
       </div>
     </>
   );

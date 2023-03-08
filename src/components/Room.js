@@ -1,14 +1,36 @@
 import React, { useState, useEffect } from "react";
-import { Redirect } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 import { useParams } from "react-router";
 import socketIOClient from "socket.io-client";
 import { endpoint } from "../endpoint";
 import { CopyButton } from "./CopyButton";
+import JSConfetti from "js-confetti";
+import useSound from "use-sound";
+
+const jsConfetti = new JSConfetti();
+
+const ROOM_TIMEOUT = 60 * 60 * 1000;
+const ROOM_TIMEOUT_TWO = 1 * 6 * 1000;
 
 const Room = () => {
   let { roomId } = useParams();
   let socket;
   let isNameSet = false;
+  const inactivityTime = () => {
+    let time;
+    document.onmousemove = resetTimer;
+    document.onkeypress = resetTimer;
+    function resetTimer() {
+      clearTimeout(time);
+      time = setTimeout(logout, ROOM_TIMEOUT);
+    }
+    function logout() {
+      localStorage.setItem("disconnect-room", roomId);
+      window.location = `/`;
+    }
+
+    resetTimer();
+  };
   let voteSequenceV = [
     true,
     true,
@@ -32,6 +54,14 @@ const Room = () => {
   const [notFound, setNotFound] = useState(false);
   const [leaderUser, setLeaderUser] = useState(false);
   const [roomVoteList, setRoomVoteList] = useState(voteSequenceV);
+  const [roomStartTime, setRoomStartTime] = useState(null);
+  const [roomTime, setRoomTime] = useState(null);
+  const [launch, setLaunch] = useState(false);
+  const [roomWaffled, setRoomWaffled] = useState(false);
+  const [playClick] = useSound("/static/sound/click.mp3");
+  const [playStart] = useSound("/static/sound/start.mp3");
+  const [playWaffle] = useSound("/static/sound/waffle.mp3");
+  const [playUnity] = useSound("/static/sound/unity.mp3");
 
   useEffect(() => {
     if (name === "") {
@@ -42,11 +72,22 @@ const Room = () => {
     }
     socket = socketIOClient(endpoint);
     socket.emit("join-session", { roomId });
+    socket.on("no-session", () => {
+      alert("Room does not exist!");
+      window.location = `/`;
+    });
     socket.on("joined-room", (data) => {
+      setRoomStartTime(data.startTime);
+      setUserId(data.userId);
+    });
+
+    socket.on("joined-room", (data) => {
+      setRoomStartTime(data.startTime);
       setUserId(data.userId);
     });
     socket.on("room-show-votes", (data) => {
       setShowVotes(true);
+      setRoomWaffled(false);
     });
     socket.on("room-hide-votes", (data) => {
       setShowVotes(false);
@@ -59,15 +100,38 @@ const Room = () => {
       setRoomVoteList(data.votes);
       setUsers(data.users);
     });
+
+    socket.on("fire", (data) => {
+      setLaunch(true);
+    });
     socket.on("no-such-room", (data) => {
       setNotFound(true);
     });
     setSession(socket);
+    inactivityTime();
     return () => {
       socket.emit("leave-room", { roomId });
       socket.disconnect();
     };
   }, []);
+
+  useEffect(() => {
+    let timer = setInterval(() => {
+      function convertTime(miliseconds) {
+        let totalSeconds = Math.floor(miliseconds / 1000);
+        let minutes = Math.floor(totalSeconds / 60);
+        let seconds = totalSeconds - minutes * 60;
+        return `${minutes.toString().padStart(2, "00")}:${seconds
+          .toString()
+          .padStart(2, "00")}`;
+      }
+      var timeSince = Date.now() - roomStartTime;
+      let tick = convertTime(timeSince);
+      setRoomTime(tick);
+    }, 100);
+
+    return () => clearInterval(timer);
+  }, [roomStartTime]);
 
   const updateName = (e) => {
     setName(e.target.value);
@@ -89,16 +153,50 @@ const Room = () => {
     return false;
   };
 
-  const displayVote = (id, vote) =>
-    showVotes
+  useEffect(() => {
+    if (showVotes) {
+      playStart();
+      let v = [...new Set(users.map((e) => e.vote))];
+      if (v.length === 1) {
+        if (v[0]) {
+          playUnity();
+          jsConfetti.addConfetti();
+        }
+      }
+    }
+  }, [showVotes]);
+
+  useEffect(() => {
+    if (launch) {
+      jsConfetti.addConfetti();
+      setLaunch(false);
+    }
+  }, [launch]);
+
+  const displayVote = (id, vote, index) => {
+    return showVotes
       ? vote.toString()
       : userId === id
       ? currentVote
       : vote
       ? "voted"
       : "not voted";
+  };
 
-  const displayWaffle = (vote, waffled) => showVotes && waffled && vote;
+  useEffect(() => {
+    if (roomWaffled) {
+      playWaffle();
+    }
+  }, [roomWaffled]);
+
+  const displayWaffle = (vote, waffled) => {
+    if (showVotes && waffled && vote) {
+      if (!roomWaffled) {
+        setRoomWaffled(true);
+      }
+    }
+    return showVotes && waffled && vote;
+  };
 
   const promote = () => {
     socket = session;
@@ -126,7 +224,7 @@ const Room = () => {
         <div>{showVotes ? <span>Voting complete!</span> : ok()}</div>
         <ul className="user-list">
           {users ? (
-            users.map((user) => (
+            users.map((user, index) => (
               <li
                 key={user.id}
                 className={`user${user.id === userId ? " current-user" : ""}${
@@ -140,7 +238,9 @@ const Room = () => {
                 </span>
                 {user.leaderUser ? <Leader /> : ""}
                 <span className="user-vote">
-                  {user.vote ? displayVote(user.id, user.vote) : "not voted"}
+                  {user.vote
+                    ? displayVote(user.id, user.vote, index)
+                    : "not voted"}
                 </span>
               </li>
             ))
@@ -172,7 +272,7 @@ const Room = () => {
   return notFound ? (
     <>
       <h2>Not found</h2>
-      <p> Try another session, or create one!</p>
+      <p>Try another session, or create one!</p>
     </>
   ) : (
     <>
@@ -180,6 +280,7 @@ const Room = () => {
         <h2 className="heading">Room - {roomId}</h2>
         <CopyButton />
       </div>
+      <div style={{ fontSize: "0.75rem" }}>Room Time: {roomTime}</div>
       {joinedRoom ? (
         <Vote
           socket={session}
@@ -207,14 +308,20 @@ const Vote = ({
   roomVoteList,
 }) => {
   let voteSequence = [false, "0", "0.5", 1, 2, 3, 5, 8, 13, 21, "?"];
+  const [play] = useSound("/static/sound/click.mp3");
 
   const castVote = (vote) => {
+    play();
     if (!vote) {
       setCurrentVote(-1);
     } else {
       setCurrentVote(vote);
     }
     socket.emit("cast-vote", { vote: vote });
+  };
+
+  const launch = () => {
+    socket.emit("fire");
   };
 
   const clearVotes = () => {
@@ -247,6 +354,9 @@ const Vote = ({
               <button onClick={hideVotes}>Hide Votes</button>
             )}
             <button onClick={clearVotes}>Clear Votes</button>
+            <button style={{ visibility: "hidden" }} onClick={launch}>
+              🚀
+            </button>
           </>
         ) : (
           <button onClick={promote}>Take Lead</button>

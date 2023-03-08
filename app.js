@@ -16,6 +16,7 @@ const SERVER_STATUS = "server-status";
 
 const START_SESSION = "start-session";
 const JOIN_SESSION = "join-session";
+const NO_SESSION = "no-session";
 
 const CREATE_ROOM = "create-room";
 const JOIN_ROOM = "join-room";
@@ -42,6 +43,8 @@ const JOINED_ROOM = "joined-room";
 
 const DEFAULT_NAME = "...";
 
+const LAUNCH = "fire";
+
 const MAX_NAME_LENGTH = 26;
 
 function handler(req, res) {}
@@ -63,14 +66,28 @@ io.on("connection", function (socket) {
     const roomId = data.roomId;
     let room = getRoom(roomId);
 
-    // Private message to user, room id and user id of current user;
-    io.to(socket.id).emit(JOINED_ROOM, { roomId, userId: socket.id });
+    if (room) {
+      // Private message to user, room id and user id of current user;
+      io.to(socket.id).emit(JOINED_ROOM, {
+        roomId,
+        userId: socket.id,
+        startTime: room.startTime,
+      });
+    } else {
+      io.to(socket.id).emit(NO_SESSION, {
+        userId: socket.id,
+      });
+    }
 
     if (room) {
       users[socket.id] = DEFAULT_NAME;
       adviseServerStatus(socket);
       joinRoom(roomId, socket);
       log(JOIN_ROOM, roomId);
+
+      socket.on(LAUNCH, function (data) {
+        io.to(roomId).emit(LAUNCH);
+      });
 
       socket.on(LEAVE_ROOM, function (data) {
         leaveRoom(roomId, socket);
@@ -234,10 +251,17 @@ function joinRoom(roomId, socket) {
 }
 
 function createRoom(socket, data) {
+  let time = Date.now();
   let roomId = makeId(12);
   io.emit(CREATE_ROOM, { data: roomId, votes: data.votes });
   socket.join(roomId);
-  let room = { id: roomId, users: [], showVotes: false, votes: data.votes };
+  let room = {
+    id: roomId,
+    users: [],
+    showVotes: false,
+    votes: data.votes,
+    startTime: time,
+  };
   rooms.push(room);
   adviseServerStatus(socket);
 }

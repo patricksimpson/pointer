@@ -3,7 +3,14 @@ import socketIOClient from "socket.io-client";
 import ReactDOM from "react-dom";
 import { endpoint } from "../endpoint";
 
-import { BrowserRouter as Router, Route, Switch, Link } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Route,
+  Routes,
+  Link,
+  useNavigate,
+  useLocation,
+} from "react-router-dom";
 
 import { Start, Join } from "./session";
 import { Room } from "./Room";
@@ -21,7 +28,7 @@ const App = () => {
         setMode(currentMode);
       }
     }
-  });
+  }, []);
 
   const switchMode = () => {
     let newMode;
@@ -48,68 +55,108 @@ const App = () => {
   return (
     <>
       <Router>
-        <div className="header-wrapper">
-          <Link to="/" className="header">
-            <h1>
-              <span>Pointer</span>
-            </h1>
-          </Link>
-          <img src="/static/logo.svg" className="header-icon" />
-          <img
-            src="/static/logo-dark.svg"
-            className="dark-header-icon header-icon"
-          />
-          <span className="toggle">
-            <img
-              className="toggle-button"
-              src="/static/mode-toggle.svg"
-              alt="dark/light mode toggle"
-              title="dark/light mode toggle"
-              height="24px"
-              width="24px"
-              onClick={switchMode}
-            />
-          </span>
-          <nav className="header-nav">
-            <ul>
-              <li>
-                <Link to="/">Home</Link>
-              </li>
-              <li>
-                <Link to="/start-session">Start Session</Link>
-              </li>
-              <li>
-                <Link to="/about">About</Link>
-              </li>
-            </ul>
-          </nav>
-        </div>
-        <div className="subheader">
-          <span>A simple agile pointing tool.</span>
-        </div>
-        <Switch>
-          <Route path="/join">
-            <Join />
-          </Route>
-          <Route path="/start-session">
-            <Start />
-          </Route>
-          <Route path="/about">
-            <About />
-          </Route>
-          <Route path="/room/:roomId" component={Room} />
-          <Route path="/">
-            <Home />
-          </Route>
-          <Route component={NoMatch} />
-        </Switch>
+        <Nav switchMode={switchMode} />
+        <Routes>
+          <Route path="/join" element={<Join />} />
+          <Route path="/start-session" element={<Start />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/room/:roomId" element={<Room />} />
+          <Route path="/" element={<Home />} />
+          <Route element={NoMatch} />
+        </Routes>
       </Router>
       <Footer />
     </>
   );
 };
 
-const Nav = () => <Router></Router>;
+const Nav = ({ switchMode }) => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [room, setRoom] = useState(null);
+
+  const doubleCheck = (e) => {
+    let path = window.location.pathname;
+    setRoom(null);
+    if (path.includes("room")) {
+      e.preventDefault();
+      if (window.confirm("Are you sure you want to leave your sesson?")) {
+        navigate(e.target.pathname);
+      }
+    }
+  };
+
+  useEffect(() => {
+    let roomId = localStorage.getItem("disconnect-room");
+    if (roomId) {
+      setRoom(roomId);
+      localStorage.removeItem("disconnect-room");
+    }
+  }, []);
+  return (
+    <>
+      <div className="header-wrapper">
+        <Link to="/" className="header" onClick={doubleCheck}>
+          <h1>
+            <span>Pointer</span>
+          </h1>
+        </Link>
+        <img src="/static/logo.svg" className="header-icon" />
+        <img
+          src="/static/logo-dark.svg"
+          className="dark-header-icon header-icon"
+        />
+        <span className="toggle">
+          <img
+            className="toggle-button"
+            src="/static/mode-toggle.svg"
+            alt="dark/light mode toggle"
+            title="dark/light mode toggle"
+            height="24px"
+            width="24px"
+            onClick={switchMode}
+          />
+        </span>
+        <nav className="header-nav">
+          <ul>
+            <li>
+              <Link to="/" onClick={doubleCheck}>
+                Home
+              </Link>
+            </li>
+            <li>
+              <Link to="/start-session" onClick={doubleCheck}>
+                Start Session
+              </Link>
+            </li>
+            <li>
+              <Link to="/about" onClick={doubleCheck}>
+                About
+              </Link>
+            </li>
+          </ul>
+        </nav>
+      </div>
+      <div className="subheader">
+        <span>A simple agile pointing tool.</span>
+      </div>
+      {room && (
+        <div>
+          <h2>Thanks for using pointer!</h2>
+          <p>You have been removed for being idle for over one hour...</p>
+          <p>
+            If this was a mistake, you can rejoin your room{" "}
+            <Link to={`/room/${room}`} onClick={doubleCheck}>
+              here
+            </Link>
+            .
+          </p>
+          <h3>{room}</h3>
+        </div>
+      )}
+    </>
+  );
+};
 
 const NoMatch = () => {
   return (
