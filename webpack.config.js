@@ -20,6 +20,10 @@ module.exports = () => {
       compress: true,
       port: 9000,
     },
+    output: {
+      chunkFilename: "extra.js",
+      filename: "main.js",
+    },
     resolve: {
       extensions: [".js", ".mp3"],
     },

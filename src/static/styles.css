@@ -209,6 +209,10 @@ button:active {
   background-color: #eee;
 }
 
+.toggle-button-sound {
+  top: 2.5rem;
+}
+
 @media(max-width: 1023px) {
   .waffle {
     position: absolute;
@@ -221,6 +225,10 @@ button:active {
     right: 1rem;
     top: 1rem;
   }
+
+.toggle-button-sound {
+  top: 5.5rem;
+}
 
   .waffle {
     position: absolute;

@@ -131,7 +131,7 @@ io.on("connection", function (socket) {
         room.showVotes = false;
         waffles = {};
         clearVotes(roomId, socket);
-        io.to(roomId).emit(ROOM_HIDE_VOTES);
+        io.to(roomId).emit(ROOM_HIDE_VOTES, { data: "new" });
       });
     } else {
       socket.emit(NO_ROOM, { data: roomId });

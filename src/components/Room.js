@@ -58,10 +58,14 @@ const Room = () => {
   const [roomTime, setRoomTime] = useState(null);
   const [launch, setLaunch] = useState(false);
   const [roomWaffled, setRoomWaffled] = useState(false);
+  const [roomHasVotes, setRoomHasVotes] = useState(false);
   const [playClick] = useSound("/static/sound/click.mp3");
   const [playStart] = useSound("/static/sound/start.mp3");
   const [playWaffle] = useSound("/static/sound/waffle.mp3");
   const [playUnity] = useSound("/static/sound/unity.mp3");
+  const [playPing] = useSound("/static/sound/ping.mp3");
+  const [playPop] = useSound("/static/sound/pop.mp3");
+  const [sound, setSound] = useState(true);
 
   useEffect(() => {
     if (name === "") {
@@ -91,7 +95,13 @@ const Room = () => {
     });
     socket.on("room-hide-votes", (data) => {
       setShowVotes(false);
-      setCurrentVote(-1);
+      if (data == "new") {
+        setCurrentVote(-1);
+      }
+      setRoomWaffled(false);
+      if (sound) {
+        playPing();
+      }
     });
     socket.on("promoted-user", (data) => {
       setLeaderUser(data.id);
@@ -109,11 +119,31 @@ const Room = () => {
     });
     setSession(socket);
     inactivityTime();
+    checkSound();
+    window.addEventListener("storage", checkSound);
     return () => {
+      window.removeEventListener("storage", checkSound);
       socket.emit("leave-room", { roomId });
       socket.disconnect();
     };
   }, []);
+
+  const checkSound = () => {
+    let soundOn = localStorage.getItem("sound");
+    if (soundOn === "0") {
+      setSound(false);
+    } else {
+      setSound(true);
+    }
+  };
+
+  useEffect(() => {
+    if (sound) {
+      console.log("SOUND ON");
+    } else {
+      console.log("SOUND OFF");
+    }
+  }, [sound]);
 
   useEffect(() => {
     let timer = setInterval(() => {
@@ -154,14 +184,34 @@ const Room = () => {
   };
 
   useEffect(() => {
+    if (users) {
+      let v = [...new Set(users.map((e) => e.vote))];
+      if (v.includes(true)) {
+        if (sound) {
+          playClick();
+        }
+      }
+      setRoomHasVotes(v.includes(true));
+    }
+  }, [users]);
+
+  useEffect(() => {
     if (showVotes) {
-      playStart();
+      if (sound) {
+        playPop();
+      }
       let v = [...new Set(users.map((e) => e.vote))];
       if (v.length === 1) {
-        if (v[0]) {
-          playUnity();
+        if (v[0] && users.length > 1) {
+          if (sound) {
+            playUnity();
+          }
           jsConfetti.addConfetti();
         }
+      }
+    } else {
+      if (sound) {
+        playPing();
       }
     }
   }, [showVotes]);
@@ -185,7 +235,9 @@ const Room = () => {
 
   useEffect(() => {
     if (roomWaffled) {
-      playWaffle();
+      if (sound) {
+        playWaffle();
+      }
     }
   }, [roomWaffled]);
 
@@ -289,6 +341,7 @@ const Room = () => {
           leaderUser={leaderUser == userId}
           promote={promote}
           isShowing={showVotes}
+          roomHasVotes={roomHasVotes}
           roomVoteList={roomVoteList}
         />
       ) : null}
@@ -306,12 +359,11 @@ const Vote = ({
   promote,
   isShowing,
   roomVoteList,
+  roomHasVotes,
 }) => {
   let voteSequence = [false, "0", "0.5", 1, 2, 3, 5, 8, 13, 21, "?"];
-  const [play] = useSound("/static/sound/click.mp3");
 
   const castVote = (vote) => {
-    play();
     if (!vote) {
       setCurrentVote(-1);
     } else {
@@ -329,7 +381,9 @@ const Vote = ({
   };
 
   const showVotes = () => {
-    socket.emit("room-show-votes");
+    if (roomHasVotes) {
+      socket.emit("room-show-votes");
+    }
   };
 
   const hideVotes = () => {
@@ -351,7 +405,9 @@ const Vote = ({
             {!isShowing ? (
               <button onClick={showVotes}>Show Votes</button>
             ) : (
-              <button onClick={hideVotes}>Hide Votes</button>
+              <button style={{ display: "none" }} onClick={hideVotes}>
+                Hide Votes
+              </button>
             )}
             <button onClick={clearVotes}>Clear Votes</button>
             <button style={{ visibility: "hidden" }} onClick={launch}>

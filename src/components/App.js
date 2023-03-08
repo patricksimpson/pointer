@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import socketIOClient from "socket.io-client";
-import ReactDOM from "react-dom";
+import ReactDOM from "react-dom/client";
 import { endpoint } from "../endpoint";
 
 import {
@@ -19,6 +19,7 @@ import { ServerStatus } from "./Stats";
 
 const App = () => {
   const [mode, setMode] = useState(null);
+  const [sound, setSound] = useState(1);
 
   useEffect(() => {
     if (mode == null) {
@@ -42,6 +43,17 @@ const App = () => {
     setMode(newMode);
   };
 
+  const switchSoundMode = () => {
+    if (sound) {
+      localStorage.setItem("sound", 0);
+      setSound(0);
+    } else {
+      localStorage.setItem("sound", 1);
+      setSound(1);
+    }
+    window.dispatchEvent(new Event("storage"));
+  };
+
   const displayMode = (whichMode) => {
     if (whichMode == 1) {
       document.querySelector("html").classList.add("dark");
@@ -55,7 +67,11 @@ const App = () => {
   return (
     <>
       <Router>
-        <Nav switchMode={switchMode} />
+        <Nav
+          switchMode={switchMode}
+          switchSoundMode={switchSoundMode}
+          sound={sound}
+        />
         <Routes>
           <Route path="/join" element={<Join />} />
           <Route path="/start-session" element={<Start />} />
@@ -70,10 +86,13 @@ const App = () => {
   );
 };
 
-const Nav = ({ switchMode }) => {
+const Nav = ({ switchMode, switchSoundMode, sound }) => {
+  const soundOnButton = "/static/sound-on.svg";
+  const soundOffButton = "/static/sound-off.svg";
   const navigate = useNavigate();
   const location = useLocation();
   const [room, setRoom] = useState(null);
+  const [button, setButton] = useState(soundOnButton);
 
   const doubleCheck = (e) => {
     let path = window.location.pathname;
@@ -93,6 +112,16 @@ const Nav = ({ switchMode }) => {
       localStorage.removeItem("disconnect-room");
     }
   }, []);
+
+  useEffect(() => {
+    let soundOn = localStorage.getItem("sound");
+    if (sound || soundOn !== "0") {
+      setButton(soundOnButton);
+    } else {
+      setButton(soundOffButton);
+    }
+  }, [sound]);
+
   return (
     <>
       <div className="header-wrapper">
@@ -115,6 +144,17 @@ const Nav = ({ switchMode }) => {
             height="24px"
             width="24px"
             onClick={switchMode}
+          />
+        </span>
+        <span className="toggle-sound">
+          <img
+            className="toggle-button toggle-button-sound"
+            src={button}
+            alt="dark/light mode toggle"
+            title="sound on/off toggle"
+            height="24px"
+            width="24px"
+            onClick={switchSoundMode}
           />
         </span>
         <nav className="header-nav">
@@ -229,6 +269,7 @@ const About = () => {
   );
 };
 
-ReactDOM.render(<App />, document.getElementById("root"));
+const root = ReactDOM.createRoot(document.getElementById("root"));
+root.render(<App />);
 
 export default App;
