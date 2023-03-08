@@ -190,8 +190,13 @@ const Room = () => {
         if (sound) {
           playClick();
         }
+        setRoomHasVotes(v.includes(true));
+      } else {
+        let x = [...new Set(users.map((e) => e.waffled))];
+        if (x.includes(true) && sound) {
+          playWaffle();
+        }
       }
-      setRoomHasVotes(v.includes(true));
     }
   }, [users]);
 

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import socketIOClient from "socket.io-client";
 import ReactDOM from "react-dom/client";
 import { endpoint } from "../endpoint";
+import useSound from "use-sound";
 
 import {
   BrowserRouter as Router,
@@ -20,6 +21,7 @@ import { ServerStatus } from "./Stats";
 const App = () => {
   const [mode, setMode] = useState(null);
   const [sound, setSound] = useState(1);
+  const [playClick] = useSound("/static/sound/click2.mp3");
 
   useEffect(() => {
     if (mode == null) {
@@ -33,6 +35,9 @@ const App = () => {
 
   const switchMode = () => {
     let newMode;
+    if (sound) {
+      playClick();
+    }
     if (mode == 1) {
       newMode = 2;
     } else {
@@ -44,6 +49,7 @@ const App = () => {
   };
 
   const switchSoundMode = () => {
+    playClick();
     if (sound) {
       localStorage.setItem("sound", 0);
       setSound(0);
