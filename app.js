@@ -107,10 +107,12 @@ io.on("connection", function (socket) {
         adviseRoom(roomId, socket);
       });
       socket.on(CAST_VOTE, function (data) {
+        if(!waffles[socket.id]) {
         waffled =
           votes[socket.id] != -1 &&
           votes[socket.id] != data.vote &&
-          data.vote != false;
+            data.vote != false;
+        }
         waffles[socket.id] = waffled;
         votes[socket.id] = data.vote;
         adviseRoom(roomId, socket);
