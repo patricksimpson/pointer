@@ -296,7 +296,9 @@ const Room = () => {
   const usersList = (users) => {
     return (
       <>
-        <div>{showVotes ? <span>Voting complete!</span> : ok()}</div>
+        <div>
+          {showVotes ? <span className="boom">Voting complete!</span> : ok()}
+        </div>
         {users.length < 1 && (
           <div className="waiting">Waiting for voters...</div>
         )}
@@ -383,8 +385,6 @@ const Room = () => {
       ) : null}
 
       {joinedRoom ? usersList(users) : nameInput()}
-      {joinedRoom && connecting > 0 && <div>Connecting ({connecting})</div>}
-
       {joinedRoom && (
         <div className="observers">
           Observers ({observers.length}):{" "}

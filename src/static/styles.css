@@ -439,6 +439,10 @@ button:active {
   text-align: center;
 }
 
+.boom {
+  font-weight: bold;
+}
+
 .observers {
   margin-top: 2rem;
   font-size: 0.8rem;
