@@ -95,7 +95,7 @@ const Room = () => {
     });
     socket.on("room-hide-votes", (data) => {
       setShowVotes(false);
-      if (data == "new") {
+      if (data?.data == "new") {
         setCurrentVote(-1);
       }
       setRoomWaffled(false);
