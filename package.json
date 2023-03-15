@@ -30,7 +30,8 @@
     "webpack-dev-server": "^3.10.3"
   },
   "scripts": {
-    "build": "NODE_OPTIONS=--openssl-legacy-provider webpack --mode production && npm run build:create && cachebust",
+    "cb": "cachebust",
+    "build": "webpack --mode production && npm run build:create && cachebust",
     "asset:copy": "cp -R ./src/static ./build/ && cp ./src/index.html ./build/index.html && cp ./src/*.png ./build/ && cp ./src/*.ico ./build/ && cp ./src/*.xml ./build/ && cp ./src/site.webmanifest ./build/site.webmanifest",
     "build:create": "mkdir -p build && npm run asset:copy && cp -R ./dist ./build/",
     "clean": "rm -rf ./build ./dist",
