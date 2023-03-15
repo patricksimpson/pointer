@@ -9,6 +9,7 @@ app.listen(port);
 
 let rooms = [];
 let users = {};
+let viewers = {};
 let votes = {};
 let waffles = {};
 
@@ -57,6 +58,7 @@ io.on("connection", function (socket) {
 
   socket.on(DISCONNECT, function (data) {
     delete users[socket.id];
+    delete viewers[socket.id];
     delete votes[socket.id];
     delete waffles[socket.id];
     adviseServerStatus(socket);
@@ -100,6 +102,9 @@ io.on("connection", function (socket) {
       });
       socket.on(UPDATE_NAME, function (data) {
         users[socket.id] = data.name.substring(0, MAX_NAME_LENGTH).trim();
+        if(data.observer) {
+          viewers[socket.id] = true;
+        }
         adviseRoom(roomId, socket);
       });
       socket.on(PROMOTE_USER, function (data) {
@@ -157,6 +162,7 @@ function getRoomUsers(roomId) {
     vote: getVote(id, roomId),
     leaderUser: getLeaderUser(id, roomId),
     waffled: getWaffled(id),
+    observer: getObserver(id)
   }));
 }
 
@@ -182,6 +188,11 @@ function getWaffled(id) {
   return waffles[id];
 }
 
+
+function getObserver(id) {
+  return viewers[id];
+}
+
 function leaveRoom(roomId, socket) {
   let room = getRoom(roomId);
   if (room) {
@@ -194,6 +205,7 @@ function leaveRoom(roomId, socket) {
   }
   delete users[socket.id];
   delete votes[socket.id];
+  delete viewers[socket.id];
   delete waffles[socket.id];
 }
 
@@ -217,7 +229,7 @@ function deleteRoom(roomId) {
 function adviseRoom(roomId, socket) {
   let roomUsers = getRoomUsers(roomId);
   let roomVotes = getRoomVotes(roomId);
-  io.to(roomId).emit(UPDATE_ROOM, { users: roomUsers, votes: roomVotes });
+  io.to(roomId).emit(UPDATE_ROOM, { viewers: viewers, users: roomUsers, votes: roomVotes });
 }
 
 function clearVotes(roomId, socket) {

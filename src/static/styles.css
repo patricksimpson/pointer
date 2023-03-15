@@ -435,3 +435,7 @@ button:active {
   background-color: #999;
 }
 
+.observers {
+  margin-top: 2rem;
+  font-size: 0.8rem;
+}

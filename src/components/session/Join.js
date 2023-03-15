@@ -4,6 +4,7 @@ import { Navigate } from "react-router-dom";
 const Join = () => {
   const [sessionId, setSessionId] = useState("");
   const [redirect, setRedirect] = useState();
+  const [observer, setObserver] = useState(false);
 
   const submitHandler = () => {
     setRedirect(<Navigate to={`/room/${sessionId}`} />);
@@ -12,11 +13,11 @@ const Join = () => {
   return redirect ? (
     redirect
   ) : (
-    <InputSession {...{ submitHandler, sessionId, setSessionId }} />
+    <InputSession {...{ submitHandler, sessionId, setSessionId, setObserver }} />
   );
 };
 
-const InputSession = ({ submitHandler, sessionId, setSessionId }) => {
+const InputSession = ({ submitHandler, sessionId, setSessionId, setObserver }) => {
   const handleUpdate = (e) => setSessionId(e.target.value);
 
   return (
@@ -33,7 +34,7 @@ const InputSession = ({ submitHandler, sessionId, setSessionId }) => {
               onChange={handleUpdate}
             />
           </label>
-          <button>Join Session</button>
+          <button onClick={()=>setObserver(false)}>Join session</button>
         </div>
       </div>
     </form>

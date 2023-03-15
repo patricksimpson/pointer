@@ -45,9 +45,11 @@ const Room = () => {
   ];
 
   const [currentVote, setCurrentVote] = useState(-1);
+  const [observer, setObserver] = useState(false);
   const [session, setSession] = useState();
   const [userId, setUserId] = useState(0);
   const [users, setUsers] = useState([]);
+  const [observers, setObservers] = useState([]);
   const [name, setName] = useState("");
   const [showVotes, setShowVotes] = useState(false);
   const [joinedRoom, setJoinedRoom] = useState(false);
@@ -108,7 +110,10 @@ const Room = () => {
     });
     socket.on("person-list", (data) => {
       setRoomVoteList(data.votes);
-      setUsers(data.users);
+      let rawUsers = data.users.filter((e) => !e.observer);
+      setUsers(rawUsers);
+      let rawObservers = data.users.filter((e) => e.observer);
+      setObservers(rawObservers.map((e) => e.name));
     });
 
     socket.on("fire", (data) => {
@@ -167,9 +172,21 @@ const Room = () => {
     setName(e.target.value);
   };
 
+
+  const joinAsObserver = (e) => {
+    e.preventDefault();
+    setObserver(true);
+    joinWithName(false);
+    return;
+  };
+
   const submitUpdateName = (e) => {
     e.preventDefault();
+    joinWithName();
+    return false;
+  };
 
+  const joinWithName = (vote = true) => {
     if (name.trim() === "") {
       alert("Name is required");
       e.preventDefault();
@@ -177,10 +194,9 @@ const Room = () => {
     }
 
     socket = session;
-    socket.emit("person-update-name", { name });
+    socket.emit("person-update-name", { name, observer: !vote });
     setJoinedRoom(true);
     localStorage.setItem("name", name);
-    return false;
   };
 
   useEffect(() => {
@@ -321,7 +337,8 @@ const Room = () => {
           maxLength="26"
           placeholder="name"
         />
-        <button onClick={submitUpdateName}>Set Name</button>
+        <button onClick={submitUpdateName}>Join as Voter</button>
+        <button onClick={joinAsObserver}>Join as Observer</button>
       </form>
     );
   };
@@ -348,10 +365,12 @@ const Room = () => {
           isShowing={showVotes}
           roomHasVotes={roomHasVotes}
           roomVoteList={roomVoteList}
+          observer={observer}
         />
       ) : null}
 
       {joinedRoom ? usersList(users) : nameInput()}
+      {joinedRoom && (<div className="observers">Observers ({observers.length}): {observers.join(', ')}</div>)}
     </>
   );
 };
@@ -365,6 +384,7 @@ const Vote = ({
   isShowing,
   roomVoteList,
   roomHasVotes,
+  observer,
 }) => {
   let voteSequence = [false, "0", "0.5", 1, 2, 3, 5, 8, 13, 21, "?"];
 
@@ -415,14 +435,13 @@ const Vote = ({
               </button>
             )}
             <button onClick={clearVotes}>Clear Votes</button>
-            <button style={{ visibility: "hidden" }} onClick={launch}>
+            <button onClick={launch}>
               🚀
             </button>
           </>
-        ) : (
-          <button onClick={promote}>Take Lead</button>
-        )}
+        ) : null }
       </div>
+    {!observer && (
       <div className="vote-control">
         {voteSequence.map((v, i) => (
           <button
@@ -433,7 +452,7 @@ const Vote = ({
             {v ? v : "Remove Vote"}
           </button>
         ))}
-      </div>
+      </div>)}
     </>
   );
 };
