@@ -434,6 +434,10 @@ button:active {
   border: 1px solid #ccc;
   background-color: #999;
 }
+.waiting {
+  margin: 2rem;
+  text-align: center;
+}
 
 .observers {
   margin-top: 2rem;

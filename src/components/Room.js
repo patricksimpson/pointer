@@ -295,6 +295,7 @@ const Room = () => {
     return (
       <>
         <div>{showVotes ? <span>Voting complete!</span> : ok()}</div>
+        {users.length < 1 && <div className="waiting">Waiting for voters...</div>}
         <ul className="user-list">
           {users ? (
             users.map((user, index) => (
@@ -366,6 +367,7 @@ const Room = () => {
           roomHasVotes={roomHasVotes}
           roomVoteList={roomVoteList}
           observer={observer}
+          users={users}
         />
       ) : null}
 
@@ -384,6 +386,7 @@ const Vote = ({
   isShowing,
   roomVoteList,
   roomHasVotes,
+  users,
   observer,
 }) => {
   let voteSequence = [false, "0", "0.5", 1, 2, 3, 5, 8, 13, 21, "?"];
@@ -425,7 +428,7 @@ const Vote = ({
   return (
     <>
       <div className="room-control">
-        {leaderUser ? (
+        {users.length > 0 && leaderUser ? (
           <>
             {!isShowing ? (
               <button onClick={showVotes}>Show Votes</button>
