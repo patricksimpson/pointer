@@ -61,6 +61,7 @@ const Room = () => {
   const [launch, setLaunch] = useState(false);
   const [roomWaffled, setRoomWaffled] = useState(false);
   const [roomHasVotes, setRoomHasVotes] = useState(false);
+  const [connecting, setConnecting] = useState(0);
   const [playClick] = useSound("/static/sound/click.mp3");
   const [playStart] = useSound("/static/sound/start.mp3");
   const [playWaffle] = useSound("/static/sound/waffle.mp3");
@@ -110,10 +111,12 @@ const Room = () => {
     });
     socket.on("person-list", (data) => {
       setRoomVoteList(data.votes);
+      let joining = data.users.filter((e) => e.new);
       let rawUsers = data.users.filter((e) => !e.observer);
+      setConnecting(joining.length);
       setUsers(rawUsers);
       let rawObservers = data.users.filter((e) => e.observer);
-      setObservers(rawObservers.map((e) => e.name));
+      setObservers(rawObservers);
     });
 
     socket.on("fire", (data) => {
@@ -171,7 +174,6 @@ const Room = () => {
   const updateName = (e) => {
     setName(e.target.value);
   };
-
 
   const joinAsObserver = (e) => {
     e.preventDefault();
@@ -295,7 +297,9 @@ const Room = () => {
     return (
       <>
         <div>{showVotes ? <span>Voting complete!</span> : ok()}</div>
-        {users.length < 1 && <div className="waiting">Waiting for voters...</div>}
+        {users.length < 1 && (
+          <div className="waiting">Waiting for voters...</div>
+        )}
         <ul className="user-list">
           {users ? (
             users.map((user, index) => (
@@ -308,14 +312,21 @@ const Room = () => {
                 {displayWaffle(user.vote, user.waffled) ? <Waffle /> : ""}
 
                 <span className="user-name">
-                  {user.id === userId ? <Me /> : ""} {user.name}
+                  {user.id === userId ? <Me /> : ""}{" "}
+                  {user.new ? (
+                    <marquee>new user connecting...</marquee>
+                  ) : (
+                    user.name
+                  )}
                 </span>
                 {user.leaderUser ? <Leader /> : ""}
-                <span className="user-vote">
-                  {user.vote
-                    ? displayVote(user.id, user.vote, index)
-                    : "not voted"}
-                </span>
+                {!user.new && (
+                  <span className="user-vote">
+                    {user.vote
+                      ? displayVote(user.id, user.vote, index)
+                      : "not voted"}
+                  </span>
+                )}
               </li>
             ))
           ) : (
@@ -372,7 +383,19 @@ const Room = () => {
       ) : null}
 
       {joinedRoom ? usersList(users) : nameInput()}
-      {joinedRoom && (<div className="observers">Observers ({observers.length}): {observers.join(', ')}</div>)}
+      {joinedRoom && connecting > 0 && <div>Connecting ({connecting})</div>}
+
+      {joinedRoom && (
+        <div className="observers">
+          Observers ({observers.length}):{" "}
+          {observers.map((observer, index) => (
+            <span key={observer.name + index}>
+              {observer.leaderUser && <LeaderSVG />} {observer.name}
+              {index < observers.length - 1 ? ", " : ""}
+            </span>
+          ))}
+        </div>
+      )}
     </>
   );
 };
@@ -438,24 +461,23 @@ const Vote = ({
               </button>
             )}
             <button onClick={clearVotes}>Clear Votes</button>
-            <button onClick={launch}>
-              🚀
-            </button>
+            <button onClick={launch}>🚀</button>
           </>
-        ) : null }
+        ) : null}
       </div>
-    {!observer && (
-      <div className="vote-control">
-        {voteSequence.map((v, i) => (
-          <button
-            key={`key-${v.toString()}`}
-            className={`vote-button ${voteClass(v, i)}`}
-            onClick={() => castVote(v)}
-          >
-            {v ? v : "Remove Vote"}
-          </button>
-        ))}
-      </div>)}
+      {!observer && (
+        <div className="vote-control">
+          {voteSequence.map((v, i) => (
+            <button
+              key={`key-${v.toString()}`}
+              className={`vote-button ${voteClass(v, i)}`}
+              onClick={() => castVote(v)}
+            >
+              {v ? v : "Remove Vote"}
+            </button>
+          ))}
+        </div>
+      )}
     </>
   );
 };
@@ -521,5 +543,16 @@ const Waffle = () => {
     </div>
   );
 };
+
+const LeaderSVG = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="14"
+    height="14"
+    viewBox="0 0 24 24"
+  >
+    <path d="M16.896 10l-4.896-8-4.896 8-7.104-4 3 11v5h18v-5l3-11-7.104 4zm-11.896 10v-2h14v2h-14zm14.2-4h-14.4l-1.612-5.909 4.615 2.598 4.197-6.857 4.197 6.857 4.615-2.598-1.612 5.909z" />
+  </svg>
+);
 
 export { Room };

@@ -42,7 +42,7 @@ const ROOMS_ONLINE = "rooms-online";
 
 const JOINED_ROOM = "joined-room";
 
-const DEFAULT_NAME = "...";
+const DEFAULT_NAME = " ... ";
 
 const LAUNCH = "fire";
 
@@ -102,7 +102,7 @@ io.on("connection", function (socket) {
       });
       socket.on(UPDATE_NAME, function (data) {
         users[socket.id] = data.name.substring(0, MAX_NAME_LENGTH).trim();
-        if(data.observer) {
+        if (data.observer) {
           viewers[socket.id] = true;
         }
         adviseRoom(roomId, socket);
@@ -112,10 +112,10 @@ io.on("connection", function (socket) {
         adviseRoom(roomId, socket);
       });
       socket.on(CAST_VOTE, function (data) {
-        if(!waffles[socket.id]) {
-        waffled =
-          votes[socket.id] != -1 &&
-          votes[socket.id] != data.vote &&
+        if (!waffles[socket.id]) {
+          waffled =
+            votes[socket.id] != -1 &&
+            votes[socket.id] != data.vote &&
             data.vote != false;
         }
         waffles[socket.id] = waffled;
@@ -159,10 +159,11 @@ function getRoomUsers(roomId) {
   return room.users.map((id) => ({
     id,
     name: users[id],
+    new: users[id] == DEFAULT_NAME,
     vote: getVote(id, roomId),
     leaderUser: getLeaderUser(id, roomId),
     waffled: getWaffled(id),
-    observer: getObserver(id)
+    observer: getObserver(id),
   }));
 }
 
@@ -187,7 +188,6 @@ function getVote(id, roomId) {
 function getWaffled(id) {
   return waffles[id];
 }
-
 
 function getObserver(id) {
   return viewers[id];
@@ -229,7 +229,11 @@ function deleteRoom(roomId) {
 function adviseRoom(roomId, socket) {
   let roomUsers = getRoomUsers(roomId);
   let roomVotes = getRoomVotes(roomId);
-  io.to(roomId).emit(UPDATE_ROOM, { viewers: viewers, users: roomUsers, votes: roomVotes });
+  io.to(roomId).emit(UPDATE_ROOM, {
+    viewers: viewers,
+    users: roomUsers,
+    votes: roomVotes,
+  });
 }
 
 function clearVotes(roomId, socket) {
