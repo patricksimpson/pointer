@@ -223,7 +223,9 @@ const Room = () => {
       if (sound) {
         playPop();
       }
-      let v = [...new Set(users.map((e) => e.vote))];
+      let v = [
+        ...new Set(users.filter((user) => !user.new).map((e) => e.vote)),
+      ];
       if (v.length === 1) {
         if (v[0] && users.length > 1) {
           if (sound) {
