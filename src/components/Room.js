@@ -6,6 +6,13 @@ import { endpoint } from "../endpoint";
 import { CopyButton } from "./CopyButton";
 import JSConfetti from "js-confetti";
 import useSound from "use-sound";
+import { Emoji } from "./Emoji";
+import { Leader } from "./Leader";
+import { LeaderSVG } from "./LeaderSVG";
+import { Me } from "./Me";
+import { Waffle } from "./Waffle";
+import { addEmoji } from "./utils";
+import { Vote } from "./Vote";
 
 const jsConfetti = new JSConfetti();
 
@@ -77,19 +84,13 @@ const Room = () => {
         alert("You have been kicked from the room!");
         window.location = `/`;
       }
-      // Find the user's name who was kicked
       const kickedUser = [...users, ...observers].find(user => user.id === kickUserId);
       const kickedName = kickedUser ? kickedUser.name : "A user";
-
-      // Create toast element
       const toast = document.createElement('div');
       toast.className = 'kick-toast';
       toast.textContent = `${kickedName} has been kicked from the room.`;
 
-      // Add toast to the DOM
       document.body.appendChild(toast);
-
-      // Remove toast after 3 seconds
       setTimeout(() => {
         document.body.removeChild(toast);
       }, 3000);
@@ -150,74 +151,7 @@ const Room = () => {
       setLaunch(true);
     });
     socket.on("emoji", (data) => {
-      const userElementEmoji = document.getElementById(`user-${data.id}-emoji`);
-      if (userElementEmoji) {
-        userElementEmoji.textContent = data.emoji;
-        userElementEmoji.style.opacity = '1';
-        let ele = document.createElement('span');
-        ele.className = "emoji";
-        ele.textContent = data.emoji;
-        ele.style.left = `${userElementEmoji.offsetLeft}px`;
-        userElementEmoji.parentElement.appendChild(ele);
-
-        // Make the emoji float up and disappear
-        let startPosition = 0;
-        let xOffset = 0;
-        const randomStartX = userElementEmoji.offsetLeft + Math.random() * 20 - 10; // Random value between -10 and 10
-        const wiggleAmplitude = 5; // How much to wiggle
-        const wiggleFrequency = 0.1; // How fast to wiggle
-        const animationDuration = 5000; // 5 seconds
-        const animationInterval = 50; // Update every 50ms
-        const totalSteps = animationDuration / animationInterval;
-        const moveStep = 1000 / totalSteps; // Total distance to move
-
-        ele.style.position = 'absolute';
-        ele.style.opacity = '1';
-        ele.style.transition = 'opacity 0.5s ease-out';
-        ele.style.left = `${randomStartX}px`; // Initial random x position
-
-        const floatAnimation = setInterval(() => {
-          startPosition += moveStep;
-          // Add wiggle effect with sine wave
-          xOffset = Math.sin(startPosition * wiggleFrequency) * wiggleAmplitude;
-
-          ele.style.bottom = `${startPosition}px`;
-          ele.style.left = `${randomStartX + xOffset}px`;
-
-          // Start fading out in the last second
-          if (startPosition > (100 / totalSteps) * (totalSteps - 20)) {
-            ele.style.opacity = '0';
-          }
-        }, animationInterval);
-
-        // Store the interval and timeout on the element to clear them if needed
-        //userElementEmoji.animationInterval = floatAnimation;
-
-        // Remove the element after animation completes
-        const animationTimeout = setTimeout(() => {
-          if (ele.parentNode) {
-            ele.parentNode.removeChild(ele);
-          }
-        }, animationDuration);
-
-        // Reset the emoji container back to default after animation
-        const resetTimeout = setTimeout(() => {
-          if (userElementEmoji) {
-            userElementEmoji.textContent = '😑'; // Reset to default emoji
-            userElementEmoji.style.opacity = '0'; // Hide it again
-          }
-        }, animationDuration + 500); // Add a small delay after animation completes
-
-        // Clear previous reset timeout if it exists
-        if (userElementEmoji.resetTimeout) {
-          clearTimeout(userElementEmoji.resetTimeout);
-        }
-
-        // Store the new reset timeout
-        userElementEmoji.resetTimeout = resetTimeout;
-
-        userElementEmoji.animationTimeout = animationTimeout;
-      }
+      addEmoji(data);
     });
     socket.on("no-such-room", (data) => {
       setNotFound(true);
@@ -427,7 +361,7 @@ const Room = () => {
                     user.name
                   )}
                   <span className="emoji-space" id={`user-${user.id}-emoji`} style={{ opacity: 0 }}>😑</span>
-                  {leaderUser && user.id !== userId && (<button onClick={() => kickUser(user.id)}>Kick</button>)}
+                  {leaderUser && user.id !== userId && (<button onClick={() => kickUser(user.id)}>👞</button>)}
                 </span>
                 {user.leaderUser ? <Leader /> : ""}
                 {!user.new && (
@@ -507,183 +441,5 @@ const Room = () => {
     </>
   );
 };
-
-const Emoji = ({ socket, users }) => {
-  const emoji = (emoji) => {
-    socket.emit("emoji", { emoji });
-  }
-
-  return (
-    <div className="emoji-control">
-      <button onClick={() => emoji("😃")}>😃</button>
-      <button onClick={() => emoji("😔")}>😔</button>
-      <button onClick={() => emoji("🤔")}>🤔</button>
-      <button onClick={() => emoji("🤯")}>🤯</button>
-      <button onClick={() => emoji("👏")}>👏</button>
-      <button onClick={() => emoji("💩")}>💩</button>
-      <button onClick={() => emoji("👍")}>👍</button>
-      <button onClick={() => emoji("👎")}>👎</button>
-      <button onClick={() => emoji("👌")}>👌</button>
-      <button onClick={() => emoji("❤️")}>❤️</button>
-      <button onClick={() => emoji("🔥")}>🔥</button>
-      <button onClick={() => emoji("🎉")}>🎉</button>
-    </div>
-  )
-}
-
-const Vote = ({
-  socket,
-  currentVote,
-  setCurrentVote,
-  leaderUser,
-  promote,
-  isShowing,
-  roomVoteList,
-  roomHasVotes,
-  users,
-  observer,
-}) => {
-  let voteSequence = [false, "0", "0.5", 1, 2, 3, 5, 8, 13, 21, "?"];
-
-  const castVote = (vote) => {
-    if (!vote) {
-      setCurrentVote(-1);
-    } else {
-      setCurrentVote(vote);
-    }
-    socket.emit("cast-vote", { vote: vote });
-  };
-
-  const launch = () => {
-    socket.emit("fire");
-  };
-
-  const clearVotes = () => {
-    socket.emit("room-clear-votes");
-  };
-
-  const showVotes = () => {
-    if (roomHasVotes) {
-      socket.emit("room-show-votes");
-    }
-  };
-
-  const hideVotes = () => {
-    socket.emit("room-hide-votes");
-  };
-
-  const voteClass = (v, i) => {
-    if (i > 0) {
-      if (!roomVoteList[i - 1]) return `vote-hide`;
-    }
-    return `vote${v === currentVote ? " current-vote" : ""}`;
-  };
-
-  return (
-    <>
-      <div className="room-control">
-        {users.length > 0 && leaderUser ? (
-          <>
-            {!isShowing ? (
-              <button onClick={showVotes}>Show Votes</button>
-            ) : (
-              <button style={{ display: "none" }} onClick={hideVotes}>
-                Hide Votes
-              </button>
-            )}
-            <button onClick={clearVotes}>Clear Votes</button>
-            <button onClick={launch}>🚀</button>
-          </>
-        ) : null}
-      </div>
-      {!observer && (
-        <div className="vote-control">
-          {voteSequence.map((v, i) => (
-            <button
-              key={`key-${v.toString()}`}
-              className={`vote-button ${voteClass(v, i)}`}
-              onClick={() => castVote(v)}
-            >
-              {v ? v : "Remove Vote"}
-            </button>
-          ))}
-        </div>
-      )}
-    </>
-  );
-};
-
-const Leader = () => {
-  return (
-    <div
-      className="crown icon"
-      title="This is the leader. Leader controls showing, hiding, and clearing votes. There can only be one leader at a time."
-    >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="24"
-        height="24"
-        viewBox="0 0 24 24"
-      >
-        <path d="M16.896 10l-4.896-8-4.896 8-7.104-4 3 11v5h18v-5l3-11-7.104 4zm-11.896 10v-2h14v2h-14zm14.2-4h-14.4l-1.612-5.909 4.615 2.598 4.197-6.857 4.197 6.857 4.615-2.598-1.612 5.909z" />
-      </svg>
-    </div>
-  );
-};
-
-const Me = () => {
-  return (
-    <span className="me icon" title="You">
-      (Me)
-    </span>
-  );
-};
-
-const Waffle = () => {
-  return (
-    <div
-      className="waffle icon"
-      title="Vote changed after votes had been shown!"
-    >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="24"
-        height="24"
-        viewBox="0 0 64 64"
-        xlinkHref="http://www.w3.org/1999/xlink"
-      >
-        <path
-          data-name="layer2"
-          fill="none"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth="3"
-          d="M40.5 3.2L3.2 40.5m50.6-29.1L11.3 53.8m50-28.6l-36.1 36M22.7 3.5l37.8 37.8M9.6 11.9L52 54.3M2.6 26.1l35.3 35.4"
-        ></path>
-        <circle
-          data-name="layer1"
-          cx="32"
-          cy="32"
-          r="30"
-          fill="none"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth="5"
-        ></circle>
-      </svg>
-    </div>
-  );
-};
-
-const LeaderSVG = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    width="14"
-    height="14"
-    viewBox="0 0 24 24"
-  >
-    <path d="M16.896 10l-4.896-8-4.896 8-7.104-4 3 11v5h18v-5l3-11-7.104 4zm-11.896 10v-2h14v2h-14zm14.2-4h-14.4l-1.612-5.909 4.615 2.598 4.197-6.857 4.197 6.857 4.615-2.598-1.612 5.909z" />
-  </svg>
-);
 
 export { Room };
