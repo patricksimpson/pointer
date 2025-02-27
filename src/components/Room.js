@@ -47,7 +47,7 @@ const Room = () => {
   const [currentVote, setCurrentVote] = useState(-1);
   const [observer, setObserver] = useState(false);
   const [session, setSession] = useState();
-  const [userId, setUserId] = useState(0);
+  const [userId, setUserId] = useState();
   const [users, setUsers] = useState([]);
   const [observers, setObservers] = useState([]);
   const [name, setName] = useState("");
@@ -69,6 +69,32 @@ const Room = () => {
   const [playPing] = useSound("/static/sound/ping.mp3");
   const [playPop] = useSound("/static/sound/pop.mp3");
   const [sound, setSound] = useState(true);
+  const [kickUserId, setKickUserId] = useState();
+
+  useEffect(() => {
+    if (kickUserId) {
+      if (kickUserId == userId) {
+        alert("You have been kicked from the room!");
+        window.location = `/`;
+      }
+      // Find the user's name who was kicked
+      const kickedUser = [...users, ...observers].find(user => user.id === kickUserId);
+      const kickedName = kickedUser ? kickedUser.name : "A user";
+
+      // Create toast element
+      const toast = document.createElement('div');
+      toast.className = 'kick-toast';
+      toast.textContent = `${kickedName} has been kicked from the room.`;
+
+      // Add toast to the DOM
+      document.body.appendChild(toast);
+
+      // Remove toast after 3 seconds
+      setTimeout(() => {
+        document.body.removeChild(toast);
+      }, 3000);
+    }
+  }, [kickUserId]);
 
   useEffect(() => {
     if (name === "") {
@@ -88,10 +114,6 @@ const Room = () => {
       setUserId(data.userId);
     });
 
-    socket.on("joined-room", (data) => {
-      setRoomStartTime(data.startTime);
-      setUserId(data.userId);
-    });
     socket.on("room-show-votes", (data) => {
       setShowVotes(true);
       setRoomWaffled(false);
@@ -106,6 +128,11 @@ const Room = () => {
         playPing();
       }
     });
+
+    socket.on("kick-user", (data) => {
+      setKickUserId(data.userId);
+    });
+
     socket.on("promoted-user", (data) => {
       setLeaderUser(data.id);
     });
@@ -121,6 +148,76 @@ const Room = () => {
 
     socket.on("fire", (data) => {
       setLaunch(true);
+    });
+    socket.on("emoji", (data) => {
+      const userElementEmoji = document.getElementById(`user-${data.id}-emoji`);
+      if (userElementEmoji) {
+        userElementEmoji.textContent = data.emoji;
+        userElementEmoji.style.opacity = '1';
+        let ele = document.createElement('span');
+        ele.className = "emoji";
+        ele.textContent = data.emoji;
+        ele.style.left = `${userElementEmoji.offsetLeft}px`;
+        userElementEmoji.parentElement.appendChild(ele);
+
+        // Make the emoji float up and disappear
+        let startPosition = 0;
+        let xOffset = 0;
+        const randomStartX = userElementEmoji.offsetLeft + Math.random() * 20 - 10; // Random value between -10 and 10
+        const wiggleAmplitude = 5; // How much to wiggle
+        const wiggleFrequency = 0.1; // How fast to wiggle
+        const animationDuration = 5000; // 5 seconds
+        const animationInterval = 50; // Update every 50ms
+        const totalSteps = animationDuration / animationInterval;
+        const moveStep = 1000 / totalSteps; // Total distance to move
+
+        ele.style.position = 'absolute';
+        ele.style.opacity = '1';
+        ele.style.transition = 'opacity 0.5s ease-out';
+        ele.style.left = `${randomStartX}px`; // Initial random x position
+
+        const floatAnimation = setInterval(() => {
+          startPosition += moveStep;
+          // Add wiggle effect with sine wave
+          xOffset = Math.sin(startPosition * wiggleFrequency) * wiggleAmplitude;
+
+          ele.style.bottom = `${startPosition}px`;
+          ele.style.left = `${randomStartX + xOffset}px`;
+
+          // Start fading out in the last second
+          if (startPosition > (100 / totalSteps) * (totalSteps - 20)) {
+            ele.style.opacity = '0';
+          }
+        }, animationInterval);
+
+        // Store the interval and timeout on the element to clear them if needed
+        //userElementEmoji.animationInterval = floatAnimation;
+
+        // Remove the element after animation completes
+        const animationTimeout = setTimeout(() => {
+          if (ele.parentNode) {
+            ele.parentNode.removeChild(ele);
+          }
+        }, animationDuration);
+
+        // Reset the emoji container back to default after animation
+        const resetTimeout = setTimeout(() => {
+          if (userElementEmoji) {
+            userElementEmoji.textContent = '😑'; // Reset to default emoji
+            userElementEmoji.style.opacity = '0'; // Hide it again
+          }
+        }, animationDuration + 500); // Add a small delay after animation completes
+
+        // Clear previous reset timeout if it exists
+        if (userElementEmoji.resetTimeout) {
+          clearTimeout(userElementEmoji.resetTimeout);
+        }
+
+        // Store the new reset timeout
+        userElementEmoji.resetTimeout = resetTimeout;
+
+        userElementEmoji.animationTimeout = animationTimeout;
+      }
     });
     socket.on("no-such-room", (data) => {
       setNotFound(true);
@@ -252,10 +349,10 @@ const Room = () => {
     return showVotes
       ? vote.toString()
       : userId === id
-      ? currentVote
-      : vote
-      ? "voted"
-      : "not voted";
+        ? currentVote
+        : vote
+          ? "voted"
+          : "not voted";
   };
 
   useEffect(() => {
@@ -295,6 +392,13 @@ const Room = () => {
     return buffer;
   };
 
+  const kickUser = (id) => {
+    if (window.confirm("Are you sure you want to kick this user?")) {
+      socket = session;
+      socket.emit("kick-user", { userId: id });
+    }
+  };
+
   const usersList = (users) => {
     return (
       <>
@@ -309,9 +413,9 @@ const Room = () => {
             users.map((user, index) => (
               <li
                 key={user.id}
-                className={`user${user.id === userId ? " current-user" : ""}${
-                  user.leaderUser ? " leader" : ""
-                }`}
+                id={`user-${user.id}`}
+                className={`user${user.id === userId ? " current-user" : ""}${user.leaderUser ? " leader" : ""
+                  }`}
               >
                 {displayWaffle(user.vote, user.waffled) ? <Waffle /> : ""}
 
@@ -322,6 +426,8 @@ const Room = () => {
                   ) : (
                     user.name
                   )}
+                  <span className="emoji-space" id={`user-${user.id}-emoji`} style={{ opacity: 0 }}>😑</span>
+                  {leaderUser && user.id !== userId && (<button onClick={() => kickUser(user.id)}>Kick</button>)}
                 </span>
                 {user.leaderUser ? <Leader /> : ""}
                 {!user.new && (
@@ -385,7 +491,6 @@ const Room = () => {
           users={users}
         />
       ) : null}
-
       {joinedRoom ? usersList(users) : nameInput()}
       {joinedRoom && (
         <div className="observers">
@@ -398,9 +503,33 @@ const Room = () => {
           ))}
         </div>
       )}
+      {joinedRoom && !observer && <Emoji socket={session} users={users} />}
     </>
   );
 };
+
+const Emoji = ({ socket, users }) => {
+  const emoji = (emoji) => {
+    socket.emit("emoji", { emoji });
+  }
+
+  return (
+    <div className="emoji-control">
+      <button onClick={() => emoji("😃")}>😃</button>
+      <button onClick={() => emoji("😔")}>😔</button>
+      <button onClick={() => emoji("🤔")}>🤔</button>
+      <button onClick={() => emoji("🤯")}>🤯</button>
+      <button onClick={() => emoji("👏")}>👏</button>
+      <button onClick={() => emoji("💩")}>💩</button>
+      <button onClick={() => emoji("👍")}>👍</button>
+      <button onClick={() => emoji("👎")}>👎</button>
+      <button onClick={() => emoji("👌")}>👌</button>
+      <button onClick={() => emoji("❤️")}>❤️</button>
+      <button onClick={() => emoji("🔥")}>🔥</button>
+      <button onClick={() => emoji("🎉")}>🎉</button>
+    </div>
+  )
+}
 
 const Vote = ({
   socket,

@@ -5,7 +5,8 @@
   --font-face: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
 }
 
-html, body {
+html,
+body {
   font-family: 'Roboto', sans-serif;
   padding: 0;
   margin: 0;
@@ -27,14 +28,14 @@ html, body {
 }
 
 @media(min-width: 550px) {
-    .header-wrapper {
-        display: flex;
-    }
+  .header-wrapper {
+    display: flex;
+  }
 
-    .header-nav {
-        text-align: right;
-        width: 100%;
-    }
+  .header-nav {
+    text-align: right;
+    width: 100%;
+  }
 }
 
 
@@ -72,7 +73,9 @@ a:hover {
 }
 
 
-h1, h2, h3 {
+h1,
+h2,
+h3 {
   padding: 0;
   margin: 0.5rem 0;
 }
@@ -89,7 +92,7 @@ h1, h2, h3 {
 
 .main {
   padding: 2rem;
-  flex-grow : 1;
+  flex-grow: 1;
   max-width: 45em;
 }
 
@@ -121,6 +124,7 @@ input {
 }
 
 .user {
+  position: relative;
   display: flex;
   padding: 0.25rem 0.5rem;
   font-size: 1.1rem;
@@ -135,8 +139,7 @@ input {
   text-align: right;
 }
 
-input {
-}
+input {}
 
 button {
   display: inline-block;
@@ -226,9 +229,9 @@ button:active {
     top: 1rem;
   }
 
-.toggle-button-sound {
-  top: 5.5rem;
-}
+  .toggle-button-sound {
+    top: 5.5rem;
+  }
 
   .waffle {
     position: absolute;
@@ -261,11 +264,13 @@ button:active {
 .vote-control {
   padding: 0.5rem 0;
 }
+
 .subheader {
   color: #999;
   font-size: 0.8rem;
   margin-bottom: 2rem;
 }
+
 .footer {
   font-size: 0.5rem;
   color: #999;
@@ -279,7 +284,7 @@ button:active {
 
 .dark .footer {
   border-top: 1px solid #444;
-}  
+}
 
 .footer a {
   color: #777;
@@ -316,7 +321,8 @@ button:active {
   opacity: 0;
 }
 
-.copy-text-field, .dark .copy-text-field {
+.copy-text-field,
+.dark .copy-text-field {
   border: 0 none;
   display: inline-block;
   background-color: transparent;
@@ -335,7 +341,7 @@ button:active {
   border: 1px solid #ccc;
 }
 
-.dark .copy-input-wrap{
+.dark .copy-input-wrap {
   border-color: #555;
 }
 
@@ -350,7 +356,7 @@ button:active {
   border-bottom-left-radius: 0
 }
 
-.dark .button-icon{
+.dark .button-icon {
   border-color: #555;
   background-color: #444;
 }
@@ -418,22 +424,27 @@ button:active {
 
 .crown {
   position: absolute;
-  left: 0.75rem;
+  left: -1rem;
 }
+
 .vote-button {
   border: 1px solid transparent;
 }
+
 .vote-hide {
   display: none;
 }
+
 .current-vote {
   border: 1px solid #999;
   background-color: #cdcdcd;
 }
+
 .dark .current-vote {
   border: 1px solid #ccc;
   background-color: #999;
 }
+
 .waiting {
   margin: 2rem;
   text-align: center;
@@ -446,4 +457,27 @@ button:active {
 .observers {
   margin-top: 2rem;
   font-size: 0.8rem;
+}
+
+.emoji {
+  position: absolute;
+}
+
+.emoji-space {
+  display: inline-block;
+  position: relative;
+  margin-left: 1rem;
+  content: " ";
+}
+
+.kick-toast {
+  position: fixed;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #333;
+  color: #fff;
+  padding: 10px;
+  border-radius: 5px;
+  z-index: 1000;
 }

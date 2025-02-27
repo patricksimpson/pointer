@@ -48,7 +48,7 @@ const LAUNCH = "fire";
 
 const MAX_NAME_LENGTH = 26;
 
-function handler(req, res) {}
+function handler(req, res) { }
 
 io.on("connection", function (socket) {
   adviseServerStatus(socket);
@@ -89,6 +89,17 @@ io.on("connection", function (socket) {
 
       socket.on(LAUNCH, function (data) {
         io.to(roomId).emit(LAUNCH);
+      });
+
+      socket.on("emoji", function (data) {
+        io.to(roomId).emit("emoji", { emoji: data.emoji, id: socket.id });
+      });
+
+      socket.on("kick-user", function (data) {
+        io.to(roomId).emit("kick-user", { userId: data.userId });
+        if (socket.id == room.leaderUser) {
+          kickUser(roomId, data.userId, socket);
+        }
       });
 
       socket.on(LEAVE_ROOM, function (data) {
@@ -207,6 +218,18 @@ function leaveRoom(roomId, socket) {
   delete votes[socket.id];
   delete viewers[socket.id];
   delete waffles[socket.id];
+}
+
+function kickUser(roomId, userId, socket) {
+  let room = getRoom(roomId);
+  if (room) {
+    room.users = room.users.filter((user) => user !== userId);
+    adviseRoom(roomId, socket);
+  }
+  delete users[userId];
+  delete votes[userId];
+  delete viewers[userId];
+  delete waffles[userId];
 }
 
 function cleanUpRooms(socket) {
