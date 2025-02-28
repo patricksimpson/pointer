@@ -50,6 +50,10 @@ const MAX_NAME_LENGTH = 26;
 
 function handler(req, res) { }
 
+const SIXTY_SECONDS = 60_000;
+const TWO_MINUTES = 2 * SIXTY_SECONDS;
+const FIVE_MINUTES = 5 * SIXTY_SECONDS;
+
 io.on("connection", function (socket) {
   adviseServerStatus(socket);
   socket.on(START_SESSION, function (data) {
@@ -74,6 +78,7 @@ io.on("connection", function (socket) {
         roomId,
         userId: socket.id,
         startTime: room.startTime,
+        roomData: room
       });
     } else {
       io.to(socket.id).emit(NO_SESSION, {
@@ -116,6 +121,9 @@ io.on("connection", function (socket) {
         if (data.observer) {
           viewers[socket.id] = true;
         }
+        adviseRoom(roomId, socket);
+      });
+      socket.on("fetch-room-data", function (data) {
         adviseRoom(roomId, socket);
       });
       socket.on(PROMOTE_USER, function (data) {
@@ -208,11 +216,19 @@ function leaveRoom(roomId, socket) {
   let room = getRoom(roomId);
   if (room) {
     room.users = room.users.filter((user) => user !== socket.id);
-    if (room.users.length < 1) {
-      deleteRoom(roomId);
-      adviseServerStatus(socket);
-    }
     adviseRoom(roomId, socket);
+  }
+  if (socket.id == room.leaderUser) {
+    log("Good bye LEADER", room.leaderUser);
+    delete room.leaderUser;
+    setTimeout(() => {
+      promoteUser(roomId, room.users[0]);
+    }, 150);
+  }
+  if (room.users.length < 1) {
+    setTimeout(() => {
+      cleanUpRooms();
+    }, SIXTY_SECONDS);
   }
   delete users[socket.id];
   delete votes[socket.id];
@@ -232,12 +248,11 @@ function kickUser(roomId, userId, socket) {
   delete waffles[userId];
 }
 
-function cleanUpRooms(socket) {
+function cleanUpRooms() {
   rooms.forEach((room) => {
     let roomUsers = getRoomUsers(room.id);
     if (roomUsers.length < 1) {
       deleteRoom(room.id);
-      adviseServerStatus(socket);
     }
   });
 }
@@ -281,7 +296,7 @@ function promoteUser(roomId, socketId) {
 
 function joinRoom(roomId, socket) {
   let room = getRoom(roomId);
-  if (room.users < 1) {
+  if (room.users.length < 1) {
     setTimeout(() => {
       promoteUser(roomId, socket.id);
     }, 150);

@@ -18,6 +18,8 @@ import { Room } from "./Room";
 
 import { ServerStatus } from "./Stats";
 
+const VERSION = "2.28.2025";
+
 const App = () => {
   const [mode, setMode] = useState(null);
   const [sound, setSound] = useState(1);
@@ -233,8 +235,8 @@ const Footer = () => {
   return (
     <>
       <div className="footer">
-        Built in 2020 |{" "}
-        <a href="https://patricksimpson.me/about">Patrick Simpson</a>
+        Built in 2020. | <a href="https://patricksimpson.me/about">Patrick Simpson</a><br />
+        Version {VERSION}
       </div>
     </>
   );

@@ -113,6 +113,7 @@ const Room = () => {
     socket.on("joined-room", (data) => {
       setRoomStartTime(data.startTime);
       setUserId(data.userId);
+      setShowVotes(data.roomData.showVotes);
     });
 
     socket.on("room-show-votes", (data) => {
@@ -250,6 +251,12 @@ const Room = () => {
   }, [users]);
 
   useEffect(() => {
+    if (leaderUser) {
+      fetchRoomData();
+    }
+  }, [leaderUser]);
+
+  useEffect(() => {
     if (showVotes) {
       if (sound) {
         playPop();
@@ -332,6 +339,13 @@ const Room = () => {
       socket.emit("kick-user", { userId: id });
     }
   };
+
+  const fetchRoomData = () => {
+    socket = session;
+    socket.emit("fetch-room-data", { roomId });
+  }
+
+
 
   const usersList = (users) => {
     return (
