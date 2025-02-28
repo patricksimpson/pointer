@@ -50,7 +50,8 @@ const MAX_NAME_LENGTH = 26;
 
 function handler(req, res) { }
 
-const SIXTY_SECONDS = 60_000;
+const SIXTY_SECONDS = 60000;
+
 const TWO_MINUTES = 2 * SIXTY_SECONDS;
 const FIVE_MINUTES = 5 * SIXTY_SECONDS;
 
