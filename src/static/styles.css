@@ -481,3 +481,7 @@ button:active {
   border-radius: 5px;
   z-index: 1000;
 }
+
+.kick-ass {
+  padding: 0.1rem 0.5rem;
+}

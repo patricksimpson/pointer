@@ -365,6 +365,8 @@ const Room = () => {
                 className={`user${user.id === userId ? " current-user" : ""}${user.leaderUser ? " leader" : ""
                   }`}
               >
+
+                {leaderUser && user.id !== userId && (<button className="kick-ass" onClick={() => kickUser(user.id)}>👞</button>)}
                 {displayWaffle(user.vote, user.waffled) ? <Waffle /> : ""}
 
                 <span className="user-name">
@@ -375,7 +377,6 @@ const Room = () => {
                     user.name
                   )}
                   <span className="emoji-space" id={`user-${user.id}-emoji`} style={{ opacity: 0 }}>😑</span>
-                  {leaderUser && user.id !== userId && (<button onClick={() => kickUser(user.id)}>👞</button>)}
                 </span>
                 {user.leaderUser ? <Leader /> : ""}
                 {!user.new && (
