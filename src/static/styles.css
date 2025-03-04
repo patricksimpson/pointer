@@ -485,3 +485,19 @@ button:active {
 .kick-ass {
   padding: 0.1rem 0.5rem;
 }
+
+.observer-item {
+  display: inline-block;
+  margin-right: 0.5rem;
+  position: relative;
+}
+
+.observer-item .emoji-space {
+  margin-left: 0.25rem;
+  font-size: 0.5rem;
+}
+
+.observer-item .emoji {
+  font-size: 0.5rem;
+  opacity: 0.75;
+}

@@ -18,7 +18,7 @@ import { Room } from "./Room";
 
 import { ServerStatus } from "./Stats";
 
-const VERSION = "2.28.2025-1";
+const VERSION = "3.3.2025-1";
 
 const App = () => {
   const [mode, setMode] = useState(null);

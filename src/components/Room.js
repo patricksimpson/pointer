@@ -76,7 +76,20 @@ const Room = () => {
   const [playPing] = useSound("/static/sound/ping.mp3");
   const [playPop] = useSound("/static/sound/pop.mp3");
   const [sound, setSound] = useState(true);
+  const [kickMode, setKickMode] = useState(false);
   const [kickUserId, setKickUserId] = useState();
+  const [autoShowVote, setAutoShowVote] = useState(false);
+
+  const checkAutoShowVote = () => {
+    if (autoShowVote && !showVotes) {
+      let filteredUsers = users.filter((e) => !e.vote);
+      if (filteredUsers.length == 0 && users.length > 0) {
+        setTimeout(() => {
+          session.emit("room-show-votes", { roomId });
+        }, 1000);
+      }
+    }
+  }
 
   useEffect(() => {
     if (kickUserId) {
@@ -247,6 +260,9 @@ const Room = () => {
           playWaffle();
         }
       }
+      if (autoShowVote) {
+        checkAutoShowVote();
+      }
     }
   }, [users]);
 
@@ -366,7 +382,7 @@ const Room = () => {
                   }`}
               >
 
-                {leaderUser && user.id !== userId && (<button className="kick-ass" onClick={() => kickUser(user.id)}>👞</button>)}
+                {leaderUser && user.id !== userId && kickMode && (<button className="kick-ass" onClick={() => kickUser(user.id)}>👞</button>)}
                 {displayWaffle(user.vote, user.waffled) ? <Waffle /> : ""}
 
                 <span className="user-name">
@@ -434,6 +450,10 @@ const Room = () => {
           leaderUser={leaderUser == userId}
           promote={promote}
           isShowing={showVotes}
+          kickMode={kickMode}
+          setKickMode={setKickMode}
+          autoShowVote={autoShowVote}
+          setAutoShowVote={setAutoShowVote}
           roomHasVotes={roomHasVotes}
           roomVoteList={roomVoteList}
           observer={observer}
@@ -445,14 +465,16 @@ const Room = () => {
         <div className="observers">
           Observers ({observers.length}):{" "}
           {observers.map((observer, index) => (
-            <span key={observer.name + index}>
+            <div key={observer.name + index} className="observer-item">
+              {leaderUser && observer.id !== userId && kickMode && (<button className="kick-ass" onClick={() => kickUser(observer.id)}>👞</button>)}
               {observer.leaderUser && <LeaderSVG />} {observer.name}
               {index < observers.length - 1 ? ", " : ""}
-            </span>
+              <span className="emoji-space" id={`user-${observer.id}-emoji`} style={{ opacity: 0 }}>😑</span>
+            </div>
           ))}
         </div>
       )}
-      {joinedRoom && !observer && <Emoji socket={session} users={users} />}
+      {joinedRoom && <Emoji socket={session} users={users} />}
     </>
   );
 };

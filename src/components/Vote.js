@@ -5,7 +5,10 @@ const Vote = ({
   currentVote,
   setCurrentVote,
   leaderUser,
-  promote,
+  kickMode,
+  setKickMode,
+  autoShowVote,
+  setAutoShowVote,
   isShowing,
   roomVoteList,
   roomHasVotes,
@@ -53,6 +56,8 @@ const Vote = ({
       <div className="room-control">
         {users.length > 0 && leaderUser ? (
           <>
+            {leaderUser && autoShowVote && (<button className="vote-button" onClick={() => setAutoShowVote(false)}>Disable Auto</button>)}
+            {leaderUser && !autoShowVote && (<button className="vote-button" onClick={() => setAutoShowVote(true)}>Enable Auto</button>)}
             {!isShowing ? (
               <button onClick={showVotes}>Show Votes</button>
             ) : (
@@ -61,6 +66,8 @@ const Vote = ({
               </button>
             )}
             <button onClick={clearVotes}>Clear Votes</button>
+            {leaderUser && kickMode && (<button className="vote-button" onClick={() => setKickMode(false)}>Hide Kick</button>)}
+            {leaderUser && !kickMode && (<button className="vote-button" onClick={() => setKickMode(true)}>Show Kick</button>)}
             <button onClick={launch}>🚀</button>
           </>
         ) : null}
