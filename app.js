@@ -99,6 +99,10 @@ io.on("connection", function (socket) {
 
       socket.on("emoji", function (data) {
         io.to(roomId).emit("emoji", { emoji: data.emoji, id: socket.id });
+        room.emojis++;
+        setTimeout(() => {
+          adviseRoom(roomId, socket);
+        }, 50);
       });
 
       socket.on("kick-user", function (data) {
@@ -195,6 +199,14 @@ function getRoomVotes(roomId) {
   return room.votes;
 }
 
+function getRoomEmojis(roomId) {
+  let room = getRoom(roomId);
+  if (!room) {
+    return false;
+  }
+  return room.emojis;
+}
+
 function getLeaderUser(id, roomId) {
   let room = getRoom(roomId);
   return room.leaderUser === id;
@@ -217,7 +229,6 @@ function leaveRoom(roomId, socket) {
   let room = getRoom(roomId);
   if (room) {
     room.users = room.users.filter((user) => user !== socket.id);
-    adviseRoom(roomId, socket);
   }
   if (socket.id == room.leaderUser) {
     log("Good bye LEADER", room.leaderUser);
@@ -268,10 +279,12 @@ function deleteRoom(roomId) {
 function adviseRoom(roomId, socket) {
   let roomUsers = getRoomUsers(roomId);
   let roomVotes = getRoomVotes(roomId);
+  let roomEmojis = getRoomEmojis(roomId);
   io.to(roomId).emit(UPDATE_ROOM, {
     viewers: viewers,
     users: roomUsers,
     votes: roomVotes,
+    emojis: roomEmojis,
   });
 }
 
@@ -318,6 +331,7 @@ function createRoom(socket, data) {
     showVotes: false,
     votes: data.votes,
     startTime: time,
+    emojis: 0
   };
   rooms.push(room);
   adviseServerStatus(socket);

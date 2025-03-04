@@ -79,6 +79,7 @@ const Room = () => {
   const [kickMode, setKickMode] = useState(false);
   const [kickUserId, setKickUserId] = useState();
   const [autoShowVote, setAutoShowVote] = useState(false);
+  const [roomEmojis, setRoomEmojis] = useState(0);
 
   const checkAutoShowVote = () => {
     if (autoShowVote && !showVotes) {
@@ -152,6 +153,8 @@ const Room = () => {
       setLeaderUser(data.id);
     });
     socket.on("person-list", (data) => {
+      console.log("person-list", data.emojis);
+      setRoomEmojis(data.emojis);
       setRoomVoteList(data.votes);
       let joining = data.users.filter((e) => e.new);
       let rawUsers = data.users.filter((e) => !e.observer);
@@ -475,6 +478,11 @@ const Room = () => {
         </div>
       )}
       {joinedRoom && <Emoji socket={session} users={users} />}
+      {joinedRoom && (
+        <div className="observers">
+          Emoji Score: {roomEmojis}
+        </div>
+      )}
     </>
   );
 };
